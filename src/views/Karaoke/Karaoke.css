@@ -1,0 +1,196 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Poppins', Arial, sans-serif;
+  background-color: #111;
+}
+
+.karaoke-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  color: #fff;
+}
+
+.karaoke-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  border-bottom: 1px solid #333;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #ffa500;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.back-button:hover {
+  transform: scale(1.2);
+}
+
+.header-icon {
+  color: #ffa500;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.karaoke-content {
+  display: flex;
+  flex: 1;
+  gap: 2rem;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.waitlist {
+  flex: 1;
+  max-width: 33.33%;
+  background-color: #1e1e1e;
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  overflow-y: auto;
+}
+
+.waitlist h2 {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #ffa500;
+}
+
+.waitlist ul {
+  list-style: none;
+}
+
+.waitlist li {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+}
+
+.waitlist li:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+}
+
+.waitlist li .table {
+  font-weight: bold;
+  color: #ffa500;
+  font-size: 1.3rem; 
+}
+
+.waitlist li .name {
+  font-size: 2.2rem; 
+  font-weight: 600;
+}
+
+.waitlist li .song {
+  font-style: italic;
+  color: #ccc;
+  font-size: 1.2rem;
+}
+
+.waitlist::-webkit-scrollbar {
+  width: 8px;
+}
+
+.waitlist::-webkit-scrollbar-track {
+  background: #1e1e1e;
+  border-radius: 8px;
+}
+
+.waitlist::-webkit-scrollbar-thumb {
+  background: #555;
+  border-radius: 8px;
+}
+
+.waitlist::-webkit-scrollbar-thumb:hover {
+  background: #777;
+}
+
+.stage {
+  flex: 2;
+  background-color: #1e1e1e;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.stage {
+  flex: 2;
+  background-color: #1e1e1e;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column; 
+}
+
+.stage h2 {
+  font-size: 2rem;
+  color: #ffa500;
+  text-align: center;
+  margin-bottom: 1.5rem; 
+}
+
+.stage-card {
+  background: #2f2f2f;
+  border-radius: 16px;
+  padding: 3rem;
+  flex: 1; 
+  width: 90%; 
+  text-align: center;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  transition: transform 0.2s;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.stage-card:hover {
+  transform: translateY(-5px);
+}
+
+.stage-card .table {
+  font-size: 1.5rem;
+  color: #ffa500;
+  margin-bottom: 1rem;
+}
+
+.stage-card .name {
+  font-size: 3rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+.stage-card .song {
+  font-size: 1.5rem;
+  font-style: italic;
+  color: #ccc;
+}
+
+

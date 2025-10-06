@@ -5,6 +5,7 @@ import Register from '@/views/Register/Register.vue'
 import ForgotPassword from '@/views/ForgotPassword/ForgotPassword.vue'
 import ResetPassword from '@/views/ResetPassword/ResetPassword.vue'
 import Tabs from '@/views/Tabs/Tabs.vue'
+import Karaoke from '@/views/Karaoke/Karaoke.vue'
 
 const routes = [
 
@@ -37,6 +38,11 @@ const routes = [
     path: '/comandas',
     name: 'Tabs',
     component: Tabs
+  },
+  {
+    path: '/karaoke',
+    name: 'Karaoke',
+    component: Karaoke
   },
 ]
 
