@@ -6,9 +6,17 @@ import ForgotPassword from '@/views/ForgotPassword/ForgotPassword.vue'
 import ResetPassword from '@/views/ResetPassword/ResetPassword.vue'
 import Tabs from '@/views/Tabs/Tabs.vue'
 import Karaoke from '@/views/Karaoke/Karaoke.vue'
+import OrderLaunch from '@/views/OrderLaunch/OrderLaunch.vue'
+import InventoryControl from '@/views/InventoryControl/InventoryControl.vue'
+import Home from '@/views/Home/Home.vue'
 
 const routes = [
 
+  {
+    path: '/',
+    name: 'Home',
+    component: Home
+  },
   {
     path: '/relatorios',
     name: 'AdmReport',
@@ -43,6 +51,16 @@ const routes = [
     path: '/karaoke',
     name: 'Karaoke',
     component: Karaoke
+  },
+  {
+    path: '/pedidos',
+    name: 'OrderLaunch',
+    component: OrderLaunch
+  },
+  {
+    path: '/estoque',
+    name: 'InventoryControl',
+    component: InventoryControl
   },
 ]
 
