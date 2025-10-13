@@ -1,8 +1,29 @@
 <template>
   <div class="order-launch">
+<Tabs :tabs="['Comandas', 'Pedidos', 'Pagamento', 'Karaokê']"/>
     <header class="order-header">
-      <h1>Lançamento de Pedido</h1>
+      <h4>Lançamento de Pedido</h4>
     </header>
+    <section class="order-info">
+      <div class="order-field">
+        <label for="table-number">Mesa</label>
+        <input
+          id="table-number"
+          type="number"
+          v-model="tableNumber"
+          placeholder="Número da mesa"
+        />
+      </div>
+      <div class="order-field">
+        <label for="customer-name">Nome</label>
+        <input
+          id="customer-name"
+          type="text"
+          v-model="customerName"
+          placeholder="Nome do cliente"
+        />
+      </div>
+    </section>
 
     <main class="order-content">
       <section class="order-products">
@@ -77,12 +98,12 @@
         </button>
       </aside>
     </main>
-
   </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import Tabs from "@/components/Tabs.vue";
 import './orderLaunch.css'
 
 const tabs = ref(['Lanches', 'Coquetéis', 'Doses e Drinks'])
@@ -91,6 +112,24 @@ const activeTab = ref('Lanches')
 const items = ref([
   {
     id: 1,
+    category: 'Lanches',
+    name: 'X-Tudo',
+    subtitle: 'Pão com tudo que tem num x-tudo',
+    price: 25,
+    icon: 'https://img.icons8.com/emoji/48/hamburger-emoji.png',
+    quantity: 0
+  },
+  {
+    id: 5,
+    category: 'Lanches',
+    name: 'X-Tudo',
+    subtitle: 'Pão com tudo que tem num x-tudo',
+    price: 25,
+    icon: 'https://img.icons8.com/emoji/48/hamburger-emoji.png',
+    quantity: 0
+  },
+  {
+    id: 7,
     category: 'Lanches',
     name: 'X-Tudo',
     subtitle: 'Pão com tudo que tem num x-tudo',

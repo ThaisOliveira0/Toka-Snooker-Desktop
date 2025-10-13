@@ -3,34 +3,52 @@
     <nav class="tab-header" role="tablist">
       <button
         v-for="tab in tabs"
-        :key="tab"
-        :class="{ active: tab === selectedTab }"
-        @click="selectedTab = tab"
+        :key="tab.path"
+        :class="{ active: tab.path === selectedTab }"
+        @click="selectTab(tab)"
         role="tab"
-        :aria-selected="tab === selectedTab"
+        :aria-selected="tab.path === selectedTab"
       >
-        {{ tab }}
+        {{ tab.name }}
       </button>
     </nav>
-
-    <div class="tab-content">
-      <slot :name="selectedTab" />
-    </div>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 const props = defineProps({
-  tabs: { type: Array, default: () => ['Comandas', 'Pedidos', 'Pagamento', 'Karaokê'] }
-});
+  tabs: {
+    type: Array,
+    default: () => [
+      { name: 'Comandas', path: '/comandas' },
+      { name: 'Pedidos', path: '/pedidos' },
+      { name: 'Pagamento', path: '/pagamento' },
+      { name: 'Karaokê', path: '/karaoke' }
+    ]
+  }
+})
 
-const selectedTab = ref(props.tabs[0] || '');
+const router = useRouter()
+const route = useRoute()
+const selectedTab = ref(route.path)  
 
-watch(() => props.tabs, (newTabs) => {
-  if (newTabs && newTabs.length) selectedTab.value = newTabs[0];
-});
+watch(
+  () => route.path,
+  (newPath) => {
+    selectedTab.value = newPath
+  },
+  { immediate: true }
+)
+
+const selectTab = (tab) => {
+  if (tab.path !== selectedTab.value) {
+    selectedTab.value = tab.path
+    router.push(tab.path)
+  }
+}
 </script>
 
 <style scoped>
@@ -38,7 +56,7 @@ watch(() => props.tabs, (newTabs) => {
   display: flex;
   gap: 1rem;
   border-bottom: 1px solid #eee;
-  padding-bottom: .5rem;
+  padding-bottom: 0.5rem;
 }
 .tab-header button {
   background: transparent;
@@ -46,12 +64,10 @@ watch(() => props.tabs, (newTabs) => {
   padding: 0.5rem 0.8rem;
   font-weight: 600;
   cursor: pointer;
+  transition: color 0.2s, border-bottom 0.2s;
 }
 .tab-header button.active {
   color: #208c4a;
   border-bottom: 3px solid #208c4a;
-}
-.tab-content { 
-  padding-top: 1rem; 
 }
 </style>

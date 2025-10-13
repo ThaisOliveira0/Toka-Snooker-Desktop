@@ -7,8 +7,6 @@
       </div>
     </header>
 
-    <Tabs :tabs="['Comandas', 'Pedidos', 'Pagamento', 'Karaokê']">
-      <template #Comandas>
         <div class="carousel-wrap">
           <button
             class="arrow left"
@@ -30,23 +28,8 @@
             @click="scrollRight"
             aria-label="scroll right"
           >
-            ›
           </button>
         </div>
-      </template>
-
-      <template #Pedidos>
-        <div class="placeholder">Aqui entra a tela de Pedidos</div>
-      </template>
-
-      <template #Pagamento>
-        <div class="placeholder">Tela de Pagamento</div>
-      </template>
-
-      <template #Karaokê>
-        <div class="placeholder">Playlist / Controle do Karaokê</div>
-      </template>
-    </Tabs>
   </div>
 </template>
 
