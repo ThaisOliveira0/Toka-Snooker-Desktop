@@ -1,6 +1,5 @@
 <template>
   <div class="order-launch">
-<Tabs :tabs="['Comandas', 'Pedidos', 'Pagamento', 'Karaokê']"/>
     <header class="order-header">
       <h4>Lançamento de Pedido</h4>
     </header>

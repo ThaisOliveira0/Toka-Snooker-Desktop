@@ -1,28 +1,9 @@
 <template>
   <div class="home-page">
-    <header class="navbar">
       <div class="logo-area">
         <!-- <img src="/images/tokaname.png" alt="Toka Snooker Bar Logo" class="logo-icon" /> -->
         <span class="logo-text"></span> 
       </div>
-      
-      <nav class="nav-menu">
-        <a href="#" class="nav-item active">HOME</a>
-        <a href="#" class="nav-item">MENU</a>
-        <a href="#" class="nav-item">ATRAÇÕES</a>
-        <a href="#" class="nav-item">QUEM SOMOS</a>
-        <a href="#" class="nav-item">CONTATO</a>
-      </nav>
-
-      <div class="action-icons">
-        <span class="search-icon">🔍</span>
-        <a href="/login" class="login-link">
-          <span class="user-icon">👤</span>
-          <span class="login-text">FAÇA LOGIN</span>
-        </a>
-      </div>
-    </header>
-
     <section class="hero-section">
       <div class="hero-image-container">
         <!-- <img src="/images/toka.jpg" alt="Interior do Toka Snooker Bar" class="main-bar-photo" /> -->

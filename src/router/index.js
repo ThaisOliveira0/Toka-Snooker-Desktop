@@ -11,7 +11,6 @@ import InventoryControl from '@/views/InventoryControl/InventoryControl.vue'
 import Home from '@/views/Home/Home.vue'
 
 const routes = [
-
   {
     path: '/',
     name: 'Home',
@@ -20,7 +19,8 @@ const routes = [
   {
     path: '/relatorios',
     name: 'AdmReport',
-    component: AdmReport
+    component: AdmReport,
+    meta: { roles: ['admin'] } 
   },
   {
     path: '/login',
@@ -45,24 +45,29 @@ const routes = [
   {
     path: '/comandas',
     name: 'Tabs',
-    component: Tabs
+    component: Tabs,
+    meta: { roles: ['admin', 'funcionario'] }
   },
   {
     path: '/karaoke',
     name: 'Karaoke',
-    component: Karaoke
+    component: Karaoke,
+    meta: { roles: ['funcionario'] }
   },
   {
     path: '/pedidos',
     name: 'OrderLaunch',
-    component: OrderLaunch
+    component: OrderLaunch,
+    meta: { roles: ['admin', 'funcionario'] }
   },
   {
     path: '/estoque',
     name: 'InventoryControl',
-    component: InventoryControl
+    component: InventoryControl,
+    meta: { roles: ['admin'] }
   },
 ]
+
 
 const router = createRouter({
   history: createWebHistory(),
