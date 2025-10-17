@@ -18,24 +18,6 @@
 <script setup>
 import Card from '@/components/Card.vue'
 import MonthlyChart from '@/components/MonthlyChart.vue'
+import './AdmReport.css'
 
 </script>
-
-<style scoped>
-.report-page {
-  padding: 2rem;
-}
-
-.cards-container {
-  display: flex;
-  gap: 1rem;
-  margin-bottom: 2rem;
-}
-
-.chart-container {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-}
-</style>

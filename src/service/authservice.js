@@ -17,3 +17,18 @@ export async function login(email, senha) {
     throw error;
   }
 }
+
+export async function register(nome, email, senha, tipoUsuario) {
+  try {
+    const response = await axios.post(`${API_URL}/register`, {
+      nome,
+      email,
+      senha,
+      role: tipoUsuario, 
+    })
+    return response.data
+  } catch (error) {
+    console.error('Erro ao cadastrar:', error.response?.data || error)
+    throw error
+  }
+}

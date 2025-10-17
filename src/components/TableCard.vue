@@ -77,66 +77,108 @@ const total = computed(() => {
 
 <style scoped>
 .table-card {
-  background: #fff;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  position: relative;
+  background: #fffef8; 
+  padding: 1rem 1.2rem;
+  border-radius: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  min-width: 20%;  
-  height: 60vh;  
+  min-width: 350px;
+  max-width: 400px;
+  min-height: 500px;
+  border: 1px solid #e0e0e0;
+  font-family: 'Courier New', monospace; 
+  overflow: hidden;
+}
+
+.table-card::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 100%;
+  height: 20px;
+  background: radial-gradient(circle at 10px 10px, transparent 10px, #f6f6f6 11px);
+  background-size: 20px 20px;
 }
 
 .table-title {
   text-align: center;
-  color: #208c4a;
-  margin: 0 0 0.6rem;
-  font-size: 1.05rem;
-  letter-spacing: 0.6px;
+  color: #323a29;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  border-bottom: 2px dashed #ccc;
+  padding-bottom: 0.3rem;
 }
+
 .section {
-  margin-bottom: 0.6rem;
+  margin-bottom: 0.8rem;
 }
+
 .section h4 {
-  color: #d9534f;
-  margin: 0 0 0.4rem;
-  font-size: 0.85rem;
   text-align: center;
+  font-size: 0.75rem;
+  color: #666;
+  letter-spacing: 0.5px;
+  margin-bottom: 0.3rem;
+  border-bottom: 1px dashed #ddd;
+  padding-bottom: 0.2rem;
 }
+
 table {
   width: 100%;
-  font-size: 0.87rem;
   border-collapse: collapse;
+  font-size: 0.82rem;
 }
+
 thead th {
   text-align: left;
-  font-weight: 700;
-  font-size: 0.78rem;
   color: #444;
+  border-bottom: 1px dotted #aaa;
+  padding-bottom: 2px;
 }
+
 tbody td {
-  padding: 4px 0;
+  padding: 2px 0;
   color: #333;
 }
+
 .footer {
-  margin-top: 0.6rem;
+  border-top: 1px dashed #ccc;
+  padding-top: 0.5rem;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
 }
+
 .total {
-  text-align: center;
-  font-size: 0.95rem;
-  color: #333;
+  text-align: right;
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #111;
 }
+
 .close-btn {
-  background: #208c4a;
+  background: #222;
   color: #fff;
   border: none;
   padding: 0.5rem;
-  border-radius: 20px;
+  border-radius: 4px;
   cursor: pointer;
   width: 100%;
+  font-family: inherit;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  transition: background 0.2s;
 }
+
+.close-btn:hover {
+  background: #444;
+}
+
+
 </style>

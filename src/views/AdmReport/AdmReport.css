@@ -1,0 +1,58 @@
+.report-page {
+  padding: 2rem;
+  background: radial-gradient(circle at top left, #0d1b2a, #1b263b);
+  min-height: 100vh;
+  color: #e0e6ed;
+  font-family: 'Inter', sans-serif;
+}
+
+.page-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #f8fafc;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2.5rem;
+}
+
+.chart-container {
+  background: linear-gradient(145deg, #1e2a3a, #24344c);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:deep(.card) {
+  background: linear-gradient(145deg, #24344c, #1e2a3a) !important;
+  padding: 1rem;
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e0e6ed;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+
+:deep(.card:hover) {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 20px rgba(0, 255, 255, 0.2);
+}
+
+:deep(.card-title) {
+  font-size: 1rem;
+  color: #9fb3c8;
+  margin-bottom: 0.5rem;
+}
+
+:deep(.card-value) {
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: #f1f5f9;
+}

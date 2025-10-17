@@ -7,10 +7,10 @@
 html, body {
   width: 100%;
   height: 100%;
-  overflow: hidden;
   font-family: 'Poppins', Arial, sans-serif;
-  background-color: #ffffff;
+  background-color: transparent; 
 }
+
 
 .karaoke-container {
   height: 100vh;
@@ -18,6 +18,8 @@ html, body {
   flex-direction: column;
   padding: 1rem;
   color: #fff;
+  background: radial-gradient(circle at top left, #0d1b2a, #1e1e1e);
+
 }
 
 .karaoke-header {

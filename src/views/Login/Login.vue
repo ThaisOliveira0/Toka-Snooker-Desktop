@@ -48,7 +48,6 @@ async function handleLogin() {
 
   try {
     const response = await login(email.value, senha.value);
-    console.log('Login realizado com sucesso:', response);
 
     router.push('/comandas');
   } catch (error) {
