@@ -3,6 +3,7 @@
     <header class="order-header">
       <h4>Lançamento de Pedido</h4>
     </header>
+
     <section class="order-info">
       <div class="order-field">
         <label for="table-number">Mesa</label>
@@ -13,6 +14,7 @@
           placeholder="Número da mesa"
         />
       </div>
+
       <div class="order-field">
         <label for="customer-name">Nome</label>
         <input
@@ -51,7 +53,15 @@
             </div>
 
             <div class="item-actions">
-              <div class="item-price">R$ {{ item.price.toFixed(2) }}</div>
+              <div class="item-price">
+                <template v-if="item.promo">
+                  <!-- <span class="old-price">R$ {{ item.oldPrice.toFixed(2) }}</span> -->
+                  <span class="promo-price">R$ {{ item.price.toFixed(2) }}</span>
+                </template>
+                <template v-else>
+                  R$ {{ item.price.toFixed(2) }}
+                </template>
+              </div>
 
               <div class="item-quantity">
                 <button @click="decreaseItem(item)">−</button>
@@ -101,61 +111,52 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import Tabs from "@/components/Tabs.vue";
+import { ref, computed, onMounted, watch } from 'vue'
+import orderService from '../../service/ordersService'
 import './orderLaunch.css'
 
-const tabs = ref(['Lanches', 'Coquetéis', 'Doses e Drinks'])
-const activeTab = ref('Lanches')
+const tableNumber = ref('')
+const customerName = ref('')
 
-const items = ref([
-  {
-    id: 1,
-    category: 'Lanches',
-    name: 'X-Tudo',
-    subtitle: 'Pão com tudo que tem num x-tudo',
-    price: 25,
-    icon: 'https://img.icons8.com/emoji/48/hamburger-emoji.png',
-    quantity: 0
-  },
-  {
-    id: 5,
-    category: 'Lanches',
-    name: 'X-Tudo',
-    subtitle: 'Pão com tudo que tem num x-tudo',
-    price: 25,
-    icon: 'https://img.icons8.com/emoji/48/hamburger-emoji.png',
-    quantity: 0
-  },
-  {
-    id: 7,
-    category: 'Lanches',
-    name: 'X-Tudo',
-    subtitle: 'Pão com tudo que tem num x-tudo',
-    price: 25,
-    icon: 'https://img.icons8.com/emoji/48/hamburger-emoji.png',
-    quantity: 0
-  },
-  {
-    id: 2,
-    category: 'Coquetéis',
-    name: 'Mojito',
-    subtitle: 'Drink alcoólico refrescante',
-    price: 20,
-    icon: 'https://img.icons8.com/color/48/cocktail.png',
-    quantity: 0
-  },
-  {
-    id: 3,
-    category: 'Doses e Drinks',
-    name: 'Caipirinha',
-    subtitle: 'Clássico brasileiro',
-    price: 18,
-    icon: 'https://img.icons8.com/color/48/lime.png',
+const items = ref([])
+const activeTab = ref('')
+const tabs = computed(() => {
+  const categorias = [...new Set(items.value.map(i => i.category))]
+  return categorias.length ? categorias : ['Carregando...']
+})
+
+onMounted(async () => {
+  try {
+    const response = await orderService.getAllProdutos()
+    const produtos = response.data.data
+
+items.value = produtos.map(p => {
+  const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco
+
+  return {
+    id: p.id,
+    category: p.categoria,
+    name: p.nome,
+    subtitle: p.descricao,
+    price: temPromo ? p.preco_promo : p.preco,
+    oldPrice: temPromo ? p.preco : null,
+    promo: temPromo,
+    icon: `/imagens/${p.foto}`,
     quantity: 0
   }
-])
+})
 
+
+    if (items.value.length > 0) {
+      activeTab.value = items.value[0].category
+    }
+  } catch (error) {
+    console.error('Erro ao carregar produtos:', error)
+    alert('Não foi possível carregar os produtos.')
+  }
+})
+
+// Filtros e cálculos
 const filteredItems = computed(() => 
   items.value.filter(i => i.category === activeTab.value)
 )
@@ -174,7 +175,7 @@ const cartTotal = computed(() =>
 )
 
 const confirmOrder = () => {
-  alert('Pedido confirmado com sucesso!')
+  alert(`Pedido da mesa ${tableNumber.value || '?'} confirmado!`)
   items.value.forEach(i => (i.quantity = 0))
 }
 </script>

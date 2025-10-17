@@ -7,22 +7,20 @@ const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     // 'Authorization': `Bearer ${token}`,
-    'x-api-key': 'API_KEY_AQUI' 
+    'x-api-key': 12345 
   }
 });
 
 export default {
-  getAllProdutos() {
-    return api.get("/produtos/");
-  },
-
-  getProdutosPromo() {
-    return api.get("/produtos/promo");
-  },
-
-  getProdutoById(id) {
-    return api.get(`/produtos/${id}`);
-  },
+async getAllProdutos() {
+  try {
+    const response = await api.get("/produtos/")
+    return response.data
+  } catch (error) {
+    console.error('Erro ao buscar produtos:', error)
+    return { data: [] }  
+  }
+},
 
   createProduto(produtoData) {
     return api.post("/produtos/", produtoData);

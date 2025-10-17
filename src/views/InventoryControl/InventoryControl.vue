@@ -13,7 +13,6 @@
             v-model="searchQuery" 
             placeholder="Buscar produto..." 
           />
-
           <button @click="openModal()">+ Adicionar Produto</button>
         </div>
 
@@ -32,12 +31,12 @@
             <tr 
               v-for="item in filteredItems" 
               :key="item.id"
-              :class="{ 'low-stock': item.stock <= 5 }"
+              :class="{ 'low-stock': item.estoque <= 5 }"
             >
-              <td>{{ item.name }}</td>
-              <td>{{ item.category }}</td>
-              <td>{{ item.price.toFixed(2) }}</td>
-              <td>{{ item.stock }}</td>
+              <td>{{ item.nome }}</td>
+              <td>{{ item.categoria }}</td>
+              <td>{{ (item.preco ?? 0).toFixed(2) }}</td>
+              <td>{{ item.estoque }}</td>
               <td>
                 <button class="edit-btn" @click="openModal(item)">Editar</button>
                 <button class="remove-btn" @click="removeItem(item.id)">Excluir</button>
@@ -64,16 +63,16 @@
         <h3>{{ editingItem ? 'Editar Produto' : 'Novo Produto' }}</h3>
 
         <label>Nome</label>
-        <input v-model="form.name" type="text" />
+        <input v-model="form.nome" type="text" />
 
         <label>Categoria</label>
-        <input v-model="form.category" type="text" />
+        <input v-model="form.categoria" type="text" />
 
         <label>Preço (R$)</label>
-        <input v-model.number="form.price" type="number" min="0" />
+        <input v-model.number="form.preco" type="number" min="0" />
 
         <label>Quantidade em Estoque</label>
-        <input v-model.number="form.stock" type="number" min="0" />
+        <input v-model.number="form.estoque" type="number" min="0" />
 
         <div class="modal-actions">
           <button @click="saveItem">Salvar</button>
@@ -86,73 +85,94 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import './inventoryControl.css'
+import orderService from '../../service/ordersService'
 
 const searchQuery = ref('')
 const showModal = ref(false)
 const editingItem = ref(null)
-
-const items = ref([
-  { id: 1, name: 'Pão de Hambúrguer', category: 'Lanches', price: 1.5, stock: 40 },
-  { id: 2, name: 'Queijo Mussarela', category: 'Laticínios', price: 45, stock: 10 },
-  { id: 3, name: 'Refrigerante Lata', category: 'Bebidas', price: 6, stock: 4 },
-])
-
+const items = ref([])
 const form = ref({
-  name: '',
-  category: '',
-  price: 0,
-  stock: 0
+  nome: '',
+  categoria: '',
+  preco: 0,
+  estoque: 0
+})
+
+onMounted(async () => {
+  try {
+    const response = await orderService.getAllProdutos()
+    items.value = Array.isArray(response.data) ? response.data : []
+  } catch (error) {
+    console.error('Erro ao carregar produtos:', error)
+    items.value = []
+  }
 })
 
 const filteredItems = computed(() => {
   if (!searchQuery.value) return items.value
   return items.value.filter(i =>
-    i.name.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    i.category.toLowerCase().includes(searchQuery.value.toLowerCase())
+    i.nome.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+    i.categoria.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 })
 
 const totalItems = computed(() => items.value.length)
-const totalValue = computed(() =>
-  items.value.reduce((sum, i) => sum + (i.price * i.stock), 0)
-)
+const totalValue = computed(() => {
+  if (!Array.isArray(items.value)) return 0
+  return items.value.reduce((sum, i) => sum + ((i.preco ?? 0) * (i.estoque ?? 0)), 0)
+})
+
 const lowStockCount = computed(() => 
-  items.value.filter(i => i.stock <= 5).length
+  items.value.filter(i => i.estoque <= 5).length
 )
 
 const openModal = (item = null) => {
   showModal.value = true
   if (item) {
     editingItem.value = item
-    form.value = { ...item }
+    form.value = { ...item } 
   } else {
     editingItem.value = null
-    form.value = { name: '', category: '', price: 0, stock: 0 }
+    form.value = { nome: '', categoria: '', preco: 0, estoque: 0 }
   }
 }
 
 const closeModal = () => {
   showModal.value = false
-  form.value = { name: '', category: '', price: 0, stock: 0 }
+  form.value = { nome: '', categoria: '', preco: 0, estoque: 0 }
 }
 
-const saveItem = () => {
-  if (!form.value.name.trim()) return alert('Informe o nome do produto.')
+const saveItem = async () => {
+  if (!form.value.nome.trim()) return alert('Informe o nome do produto.')
 
-  if (editingItem.value) {
-    Object.assign(editingItem.value, { ...form.value })
-  } else {
-    const newItem = { ...form.value, id: Date.now() }
-    items.value.push(newItem)
+  try {
+    if (editingItem.value) {
+      await orderService.updateProduto(editingItem.value.id, form.value)
+      const index = items.value.findIndex(i => i.id === editingItem.value.id)
+      items.value[index] = { ...editingItem.value, ...form.value }
+    } else {
+      const newItem = await orderService.createProduto(form.value)
+      items.value.push(newItem)
+    }
+    closeModal()
+  } catch (error) {
+    console.error('Erro ao salvar item:', error)
+    alert('Erro ao salvar o produto.')
   }
-  closeModal()
 }
 
-const removeItem = (id) => {
+
+const removeItem = async (id) => {
   if (confirm('Deseja realmente excluir este item?')) {
-    items.value = items.value.filter(i => i.id !== id)
+    try {
+      await orderService.deleteProduto(id)
+      items.value = items.value.filter(i => i.id !== id)
+    } catch (error) {
+      console.error('Erro ao excluir item:', error)
+      alert('Erro ao excluir produto.')
+    }
   }
 }
 </script>
