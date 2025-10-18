@@ -11,6 +11,16 @@ html, body {
   background-color: transparent; 
 }
 
+.fullscreen-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 50%;
+  margin-bottom: 10px;
+}
 
 .karaoke-container {
   height: 100vh;

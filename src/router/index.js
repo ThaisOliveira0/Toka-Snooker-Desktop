@@ -9,6 +9,7 @@ import Karaoke from '@/views/Karaoke/Karaoke.vue'
 import OrderLaunch from '@/views/OrderLaunch/OrderLaunch.vue'
 import InventoryControl from '@/views/InventoryControl/InventoryControl.vue'
 import Home from '@/views/Home/Home.vue'
+import Payment from '@/views/Payment/Payment.vue'
 
 const routes = [
   {
@@ -64,6 +65,12 @@ const routes = [
     path: '/estoque',
     name: 'InventoryControl',
     component: InventoryControl,
+    meta: { roles: ['admin'] }
+  },
+  {
+    path: '/pagamento',
+    name: 'Payment',
+    component: Payment,
     meta: { roles: ['admin'] }
   },
 ]

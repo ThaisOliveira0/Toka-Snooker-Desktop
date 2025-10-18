@@ -45,7 +45,6 @@
             :key="item.id" 
             class="order-item-card"
           >
-            <img :src="item.icon" alt="icon" class="item-icon" />
 
             <div class="item-info">
               <h3>{{ item.name }}</h3>
@@ -128,7 +127,8 @@ const tabs = computed(() => {
 onMounted(async () => {
   try {
     const response = await orderService.getAllProdutos()
-    const produtos = response.data.data
+
+    const produtos = response.data
 
 items.value = produtos.map(p => {
   const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco
@@ -141,7 +141,6 @@ items.value = produtos.map(p => {
     price: temPromo ? p.preco_promo : p.preco,
     oldPrice: temPromo ? p.preco : null,
     promo: temPromo,
-    icon: `/imagens/${p.foto}`,
     quantity: 0
   }
 })

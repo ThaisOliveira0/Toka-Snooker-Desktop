@@ -1,9 +1,13 @@
 <template>
-  <div class="karaoke-container">
+  <div class="karaoke-container" ref="karaokeRef">
     <header class="karaoke-header">
-      <button class="back-button">←</button>
-      <!-- <img src="@/assets/toka-logo.png" alt="Toka Logo" class="logo" /> -->
-      <div class="header-icon">TOKA</div>
+
+ <div class="header-right">
+        <button class="fullscreen-button" @click="toggleFullscreen">
+          <i v-if="!isFullscreen" class="fa-solid fa-expand"></i>
+          <i v-else class="fa-solid fa-compress"></i>
+        </button>
+      </div>
     </header>
 
     <main class="karaoke-content">
@@ -17,6 +21,7 @@
         </ul>
       </section>
 
+      <!-- Palco -->
       <section class="stage">
         <h2>O PALCO É SEU:</h2>
         <div class="stage-card">
@@ -30,17 +35,39 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
 import './Karaoke.css'
 
+// Referência pro container principal
+const karaokeRef = ref(null)
+const isFullscreen = ref(false)
+
+// Lista de espera
 const waitlist = [
   { table: '07', name: 'Mariana', song: 'Dancing Queen' },
   { table: '09', name: 'João', song: 'Blue Bird' },
   { table: '02', name: 'Carlos', song: 'Não Quero Dinheiro' },
 ]
 
+// Cantor atual
 const current = {
   table: '01',
   name: 'Marco',
   song: 'Evidências',
 }
+
+// Alterna o modo tela cheia
+const toggleFullscreen = async () => {
+  if (!isFullscreen.value) {
+    await karaokeRef.value.requestFullscreen()
+  } else {
+    await document.exitFullscreen()
+  }
+}
+
+// Atualiza flag quando o fullscreen muda
+document.addEventListener('fullscreenchange', () => {
+  isFullscreen.value = !!document.fullscreenElement
+})
 </script>
+

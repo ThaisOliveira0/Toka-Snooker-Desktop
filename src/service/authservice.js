@@ -1,34 +1,43 @@
 import axios from 'axios';
+import jwt_decode from 'jwt-decode'; 
 
-const API_URL = 'http://localhost:3000'; 
+const API_URL = 'http://localhost:3000';
 
 export async function login(email, senha) {
-    
   try {
     const response = await axios.post(`${API_URL}/login`, { email, senha });
-    
-    if (response.data.token) {
-      localStorage.setItem('token', response.data.token);
-    }
 
-    return response.data; 
+    if (response.data.token) {
+      const token = response.data.token;
+      sessionStorage.setItem('token', token);
+
+      const decoded = jwt_decode(token);
+      const { id, role } = decoded;  
+
+      sessionStorage.setItem('userId', id);
+      sessionStorage.setItem('userRole', role);
+
+      return { token, id, role };
+    }
+    return response.data;
   } catch (error) {
     console.error('Erro ao fazer login:', error.response?.data || error);
     throw error;
   }
 }
 
-export async function register(nome, email, senha, tipoUsuario) {
+export async function register(nome, email, telefone, senha, tipo_usuario) {
   try {
-    const response = await axios.post(`${API_URL}/register`, {
+    const response = await axios.post(`${API_URL}/usuarios`, {
       nome,
       email,
+      telefone,
       senha,
-      role: tipoUsuario, 
-    })
-    return response.data
+      tipo_usuario
+    });
+    return response.data;
   } catch (error) {
-    console.error('Erro ao cadastrar:', error.response?.data || error)
-    throw error
+    console.error('Erro ao cadastrar:', error.response?.data || error);
+    throw error;
   }
 }

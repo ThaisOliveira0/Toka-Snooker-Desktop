@@ -1,19 +1,26 @@
 <template>
-  <Tabs :tabs="tabs" />  
+  <Tabs :tabs="filteredTabs" />  
   <router-view />          
 </template>
 
 <script setup>
 import Tabs from './components/Tabs.vue'
+import { computed } from 'vue'
 
-const tabs = [
+const allTabs = [
   { name: 'Home', path: '/' },
-  { name: 'Comandas', path: '/comandas' },
-  { name: 'Pedidos', path: '/pedidos' },
-  { name: 'Karaokê', path: '/karaoke' },
-  { name: 'Relatórios', path: '/relatorios' },
-  { name: 'Cadastro', path: '/cadastro' },
-  { name: 'Estoque', path: '/estoque' },
-
+  { name: 'Comandas', path: '/comandas', roles: ['ADMIN', 'FUNCIONARIO'] },
+  { name: 'Pedidos', path: '/pedidos', roles: ['ADMIN', 'FUNCIONARIO'] },
+  { name: 'Karaokê', path: '/karaoke', roles: ['FUNCIONARIO'] },
+  { name: 'Relatórios', path: '/relatorios', roles: ['ADMIN'] },
+  { name: 'Cadastro', path: '/cadastro' ,roles: ['ADMIN']},
+  { name: 'Estoque', path: '/estoque', roles: ['ADMIN', 'FUNCIONARIO'] },
+  { name: 'Pagamento', path: '/pagamento', roles: ['ADMIN', 'FUNCIONARIO'] },
 ]
+
+const userRole = sessionStorage.getItem('userRole')
+
+const filteredTabs = computed(() =>
+  allTabs.filter(tab => !tab.roles || tab.roles.includes(userRole))
+)
 </script>

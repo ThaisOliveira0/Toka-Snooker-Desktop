@@ -1,4 +1,5 @@
 <template>
+  <div class="home-root">
   <div class="home-page">
       <div class="logo-area">
         <!-- <img src="/images/tokaname.png" alt="Toka Snooker Bar Logo" class="logo-icon" /> -->
@@ -54,6 +55,7 @@
 
     <footer>
     </footer>
+  </div>
   </div>
 </template>
 
