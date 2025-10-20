@@ -1,12 +1,17 @@
 <template>
-  <div class="login-container">
-    <div class="login-left">
-      <!-- <img src="@/assets/logo.png" alt="Logo" class="logo" /> -->
+  <div class="auth-background">
+  <div class="auth-container login">
+    <div class="auth-side left">
+      <img src="/images/logo.png" alt="Logo" class="logo" />
     </div>
 
-    <div class="login-right">
-      <div class="login-form">
-        <h2>LOGIN</h2>
+    <div class="auth-side right">
+      <form class="auth-form">
+        <button class="back-button" @click="goBack">
+          ← Voltar
+        </button>
+
+        <h2>Login</h2>
         <div class="avatar">
           <i class="fas fa-user"></i>
         </div>
@@ -14,47 +19,48 @@
         <input type="email" placeholder="E-mail" v-model="email" />
         <input type="password" placeholder="Senha" v-model="senha" />
 
-        <button class="login-button" @click="handleLogin">Entrar</button>
+        <button class="auth-button" @click.prevent="handleLogin">
+          Entrar
+        </button>
 
         <a href="#" class="forgot-password">Esqueci minha senha</a>
+
         <p class="signup-text">
-          Novo por aqui? <a href="/cadastro">Cadastre-se!</a>
+          Novo por aqui? <router-link to="/cadastro">Cadastre-se!</router-link>
         </p>
 
         <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      </div>
+      </form>
+    </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { login } from '@/service/authService'; 
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { login } from '@/service/authService'
 
-
-const email = ref('');
-const senha = ref('');
-const errorMessage = ref(''); 
-const router = useRouter();
+const email = ref('')
+const senha = ref('')
+const errorMessage = ref('')
+const router = useRouter()
 
 async function handleLogin() {
-  errorMessage.value = ''; 
-
-  if (!email.value || !senha.value) {
-    errorMessage.value = 'Por favor, preencha todos os campos.';
-    return;
-  }
-
   try {
-    const response = await login(email.value, senha.value);
-
-    router.push('/comandas');
-  } catch (error) {
-    console.error('Erro no login:', error.response?.data || error);
-    errorMessage.value = 'Login falhou. Verifique seus dados.';
+    if (!email.value || !senha.value) {
+      errorMessage.value = 'Preencha todos os campos.'
+      return
+    }
+    await login(email.value, senha.value)
+    router.push('/comandas')
+  } catch {
+    errorMessage.value = 'Login falhou. Verifique seus dados.'
   }
+}
+function goBack() {
+  router.push('/') 
 }
 </script>
 
-<style src="./login.css"></style>
+<style scoped src="./Login.css"></style>

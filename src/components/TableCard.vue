@@ -93,17 +93,6 @@ const total = computed(() => {
   overflow: hidden;
 }
 
-.table-card::after {
-  content: "";
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  width: 100%;
-  height: 20px;
-  background: radial-gradient(circle at 10px 10px, transparent 10px, #f6f6f6 11px);
-  background-size: 20px 20px;
-}
-
 .table-title {
   text-align: center;
   color: #323a29;
