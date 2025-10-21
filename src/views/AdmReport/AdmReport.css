@@ -1,58 +1,82 @@
+
 .report-page {
   padding: 2rem;
-  background: radial-gradient(circle at top left, #0d1b2a, #1b263b);
+  background: radial-gradient(circle at top left, #0a1005, #061105);
   min-height: 100vh;
   color: #e0e6ed;
   font-family: 'Inter', sans-serif;
 }
 
-.page-title {
-  font-size: 1.8rem;
-  font-weight: 600;
+.report-page h1 {
+  font-size: 2rem;
+  font-weight: 700;
   margin-bottom: 2rem;
-  color: #f8fafc;
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+  color: #f0fdf4;
+  text-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
 }
 
 .cards-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 1.5rem;
+  display: flex;
+  justify-content: space-between !important; 
+  flex-wrap: wrap;              
+  gap: 1.8rem;                    
   margin-bottom: 2.5rem;
 }
 
 .chart-container {
-  background: linear-gradient(145deg, #1e2a3a, #24344c);
+  background: linear-gradient(145deg, #1f4c1f, #2e6332);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.card{
+  background-color: #2b6830;
+}
+:deep(.card) {
+  background: linear-gradient(145deg, #2e6332, #1f4c1f) !important;
   padding: 1.5rem;
   border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-:deep(.card) {
-  background: linear-gradient(145deg, #24344c, #1e2a3a) !important;
-  padding: 1rem;
-  border-radius: 1rem;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   color: #e0e6ed;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-
 
 :deep(.card:hover) {
-  transform: translateY(-4px);
-  box-shadow: 0 6px 20px rgba(0, 255, 255, 0.2);
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 255, 0, 0.35);
 }
 
 :deep(.card-title) {
-  font-size: 1rem;
-  color: #9fb3c8;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #a3d09c;
   margin-bottom: 0.5rem;
+  text-shadow: 0 0 4px rgba(0, 255, 0, 0.3);
 }
 
 :deep(.card-value) {
-  font-size: 1.6rem;
+  font-size: 1.8rem;
   font-weight: bold;
-  color: #f1f5f9;
+  color: #d9f0d9;
 }
+
+:deep(.chart-line) {
+  stroke: #7ee787;
+  stroke-width: 3px;
+}
+
+:deep(.chart-point) {
+  fill: #c0f2c0;
+  stroke: #ffffff44;
+  stroke-width: 1.5px;
+}
+
+:deep(.chart-label) {
+  fill: #e0e6ed;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+

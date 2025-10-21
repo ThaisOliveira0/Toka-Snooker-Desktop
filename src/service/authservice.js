@@ -14,9 +14,6 @@ export async function login(email, senha) {
       const decoded = jwt_decode(token);
       const { id, role } = decoded;  
 
-      sessionStorage.setItem('userId', id);
-      sessionStorage.setItem('userRole', role);
-
       return { token, id, role };
     }
     return response.data;
@@ -40,4 +37,23 @@ export async function register(nome, email, telefone, senha, tipo_usuario) {
     console.error('Erro ao cadastrar:', error.response?.data || error);
     throw error;
   }
+}
+
+export function getToken() {
+  return sessionStorage.getItem('token');
+}
+
+export function getDecodedToken() {
+  const token = getToken();
+  if (!token) return null;
+
+  try {
+    return jwt_decode(token);
+  } catch {
+    return null;
+  }
+}
+
+export function logout() {
+  sessionStorage.removeItem('token');
 }

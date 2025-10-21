@@ -3,7 +3,6 @@
     <canvas ref="chartCanvas"></canvas>
   </div>
 </template>
-
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import {
@@ -41,10 +40,12 @@ onMounted(async () => {
         {
           label: 'Vendas',
           data: [30, 45, 28, 80, 99, 43, 60, 70, 50, 75, 90, 100],
-          borderColor: 'rgba(54, 162, 235, 1)',
-          backgroundColor: 'rgba(54, 162, 235, 0.2)',
+          borderColor: '#7ee787',       
+          backgroundColor: 'rgba(126, 231, 135, 0.2)', 
           fill: true,
-          tension: 0.4
+          tension: 0.4,
+          pointBackgroundColor: '#c0f2c0', 
+          pointBorderColor: '#ffffff44'   
         }
       ]
     },
@@ -53,16 +54,23 @@ onMounted(async () => {
       maintainAspectRatio: false,
       plugins: {
         legend: { position: 'top' },
-        title: { display: true, text: 'Relatório Mensal' }
+        title: { display: true, text: 'Relatório Mensal', color: '#e0e6ed', font: { size: 18 } }
       },
       scales: {
-        y: { beginAtZero: true }
+        y: {
+          beginAtZero: true,
+          ticks: { color: '#e0e6ed' }, 
+          grid: { color: 'rgba(255,255,255,0.1)' } 
+        },
+        x: {
+          ticks: { color: '#e0e6ed' },
+          grid: { color: 'rgba(255,255,255,0.1)' }
+        }
       }
     }
   })
 })
 </script>
-
 
 <style scoped>
 div {

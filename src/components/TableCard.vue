@@ -49,7 +49,7 @@
       <div class="total">
         Total: <strong>R$ {{ total.toFixed(2) }}</strong>
       </div>
-      <button class="close-btn" @click="$emit('close', data.table)">
+      <button class="close-btn" @click="$emit('close', data)">
         Fechar comanda
       </button>
     </div>
@@ -130,6 +130,22 @@ thead th {
   border-bottom: 1px dotted #aaa;
   padding-bottom: 2px;
 }
+
+table th:nth-child(1),
+table td:nth-child(1) {
+  text-align: left; 
+}
+
+table th:nth-child(2), 
+table td:nth-child(2) {
+  text-align: center; 
+}
+
+table th:nth-child(3),
+table td:nth-child(3) {
+  text-align: right; 
+}
+
 
 tbody td {
   padding: 2px 0;
