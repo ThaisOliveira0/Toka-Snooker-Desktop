@@ -1,8 +1,8 @@
 <template>
-  <div class="table-card" role="group" :aria-label="data.table">
-    <h3 class="table-title">{{ data.table }}</h3>
+  <div class="table-card" role="group" :aria-label="data.mesa">
+    <h3 class="table-title">{{ data.mesa }}</h3>
 
-    <div class="section orders">
+    <div class="section pedidos">
       <h4>PEDIDOS</h4>
       <table>
         <thead>
@@ -13,16 +13,19 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(o, i) in data.orders" :key="i">
-            <td>{{ o.item }}</td>
-            <td>{{ o.qty }}</td>
-            <td>R$ {{ (o.price * o.qty).toFixed(2) }}</td>
+          <tr v-for="(p, i) in data.pedido" :key="i">
+            <td>{{ p.nome }}</td>
+            <td>{{ p.quantidade }}</td>
+            <td>R$ {{ (p.valor_total * p.quantidade).toFixed(2) }}</td>
+          </tr>
+          <tr v-if="!data.pedido || data.pedido.length === 0">
+            <td colspan="3">Nenhum pedido realizado.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <div class="section karaoke">
+    <div class="section musica-pedido">
       <h4>KARAOKÊ</h4>
       <table>
         <thead>
@@ -33,13 +36,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(k, idx) in data.karaoke" :key="idx">
-            <td>{{ k.song }}</td>
-            <td>{{ k.qty ?? 1 }}</td>
-            <td>R$ {{ (k.price * (k.qty ?? 1)).toFixed(2) }}</td>
+          <tr v-for="(m, i) in data.musica_pedido" :key="i">
+            <td>{{ m.nome }}</td>
+            <td>{{ m.quantidade }}</td>
+            <td>R$ {{ (m.valor_total * m.quantidade).toFixed(2) }}</td>
           </tr>
-          <tr v-if="!data.karaoke || data.karaoke.length === 0">
-            <td colspan="3">Esse serviço não foi utilizado.</td>
+          <tr v-if="!data.musica_pedido || data.musica_pedido.length === 0">
+            <td colspan="3">Nenhum serviço de karaokê.</td>
           </tr>
         </tbody>
       </table>
@@ -58,20 +61,21 @@
 
 <script setup>
 import { computed } from "vue";
+
 const props = defineProps({
   data: { type: Object, required: true },
 });
 
 const total = computed(() => {
-  const ordersSum = (props.data.orders || []).reduce(
-    (sum, o) => sum + o.price * (o.qty ?? 1),
+  const pedidosSum = (props.data.pedido || []).reduce(
+    (sum, p) => sum + p.valor_total * p.quantidade,
     0
   );
-  const karaokeSum = (props.data.karaoke || []).reduce(
-    (sum, k) => sum + k.price * (k.qty ?? 1),
+  const musicaSum = (props.data.musica_pedido || []).reduce(
+    (sum, m) => sum + m.valor_total * m.quantidade,
     0
   );
-  return ordersSum + karaokeSum;
+  return pedidosSum + musicaSum;
 });
 </script>
 
@@ -146,7 +150,6 @@ table td:nth-child(3) {
   text-align: right; 
 }
 
-
 tbody td {
   padding: 2px 0;
   color: #333;
@@ -184,6 +187,4 @@ tbody td {
 .close-btn:hover {
   background: #444;
 }
-
-
 </style>

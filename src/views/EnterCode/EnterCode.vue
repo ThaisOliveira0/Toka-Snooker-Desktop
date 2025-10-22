@@ -11,23 +11,23 @@
             ← Voltar
           </button>
 
-          <h2>Recuperar senha</h2>
+          <h2>Verificar Código</h2>
           <div class="avatar">
-            <i class="fas fa-envelope"></i>
+            <i class="fas fa-key"></i>
           </div>
 
           <p class="info-text">
-            Digite o e-mail cadastrado para receber o link de redefinição de senha.
+            Insira o código de verificação enviado para o seu e-mail.
           </p>
 
           <input
-            type="email"
-            placeholder="E-mail"
-            v-model="email"
+            type="text"
+            placeholder="Código"
+            v-model="codigo"
           />
 
-          <button class="auth-button" @click.prevent="handlePasswordReset">
-            Enviar link
+          <button class="auth-button" @click.prevent="handleVerifyCode">
+            Verificar
           </button>
 
           <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
@@ -41,33 +41,33 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+// import { verifyCode } from '@/service/authService'
 
-
-const email = ref('')
+const codigo = ref('')
 const errorMessage = ref('')
 const successMessage = ref('')
 const router = useRouter()
 
-async function handlePasswordReset() {
-  if (!email.value) {
-    errorMessage.value = 'Por favor, insira seu e-mail.'
+async function handleVerifyCode() {
+  if (!codigo.value) {
+    errorMessage.value = 'Por favor, insira o código.'
     successMessage.value = ''
     return
   }
 
   try {
-    successMessage.value = 'Link de redefinição enviado com sucesso!'
+    successMessage.value = 'Código verificado com sucesso!'
     errorMessage.value = ''
-  } catch (error) {
-    errorMessage.value = 'Erro ao enviar o link. Verifique o e-mail informado.'
+     router.push('/redefinir-senha')
+  } catch {
+    errorMessage.value = 'Código inválido. Tente novamente.'
     successMessage.value = ''
   }
 }
 
 function goBack() {
-  router.push('/login')
+  router.push('/esqueci-senha')
 }
 </script>
 
-<style scoped src="./ForgotPassword.css"></style>
-
+<style scoped src="./EnterCode.css"></style>

@@ -23,7 +23,7 @@
           Entrar
         </button>
 
-        <a href="#" class="forgot-password">Esqueci minha senha</a>
+        <a href="/esqueci-senha" class="forgot-password">Esqueci minha senha</a>
 
         <p class="signup-text">
           Novo por aqui? <router-link to="/cadastro">Cadastre-se!</router-link>

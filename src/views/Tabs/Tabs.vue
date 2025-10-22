@@ -33,32 +33,49 @@ const cardsContainer = ref(null);
 const search = ref(""); 
 const router = useRouter();
 
+const pedidosAdaptados = computed(() =>
+  orders.map(comanda => ({
+    mesa: `Mesa ${comanda.mesa.toString().padStart(2, "0")}`,
+    pedido: (comanda.pedido || []).map(p => ({
+      nome: p.nome,
+      quantidade: p.quantidade,
+      valor_total: p.valor_total
+    })),
+    musica_pedido: (comanda.musica_pedido || []).map(m => ({
+      nome: m.nome,
+      quantidade: m.quantidade,
+      valor_total: m.valor_total
+    }))
+  }))
+);
+
 const filteredOrders = computed(() => {
-  if (!search.value.trim()) return orders;
+  if (!search.value.trim()) return pedidosAdaptados.value;
   const query = search.value.toLowerCase();
-  return orders.filter(order =>
-    String(order.table).toLowerCase().includes(query)
+  return pedidosAdaptados.value.filter(comanda =>
+    String(comanda.mesa).toLowerCase().includes(query)
   );
 });
 
-const handleClose = (order) => {
-  const safeOrder = {
-    table: order.table || "Mesa desconhecida",
-    orders: (order.orders || []).map(o => ({
-      item: o.item || "Item desconhecido",
-      qty: Number(o.qty) || 1,
-      price: Number(o.price) || 0
+const handleClose = (comanda) => {
+  const safeComanda = {
+    mesa: comanda.mesa || "Mesa desconhecida",
+    pedido: (comanda.pedido || []).map(p => ({
+      nome: p.nome || "Item desconhecido",
+      quantidade: Number(p.quantidade) || 1,
+      valor_total: Number(p.valor_total) || 0
     })),
-    karaoke: (order.karaoke || []).map(k => ({
-      song: k.song || "Música desconhecida",
-      qty: Number(k.qty) || 1,
-      price: Number(k.price) || 0
+    musica_pedido: (comanda.musica_pedido || []).map(m => ({
+      nome: m.nome || "Música desconhecida",
+      quantidade: Number(m.quantidade) || 1,
+      valor_total: Number(m.valor_total) || 0
     }))
   };
 
-  sessionStorage.setItem("selectedOrder", JSON.stringify(safeOrder));
+  sessionStorage.setItem("selectedOrder", JSON.stringify(safeComanda));
   router.push({ name: "Payment" });
 };
 </script>
+
 
 <style src="./tabs.css"></style>

@@ -10,6 +10,7 @@ import OrderLaunch from '@/views/OrderLaunch/OrderLaunch.vue'
 import InventoryControl from '@/views/InventoryControl/InventoryControl.vue'
 import Home from '@/views/Home/Home.vue'
 import Payment from '@/views/Payment/Payment.vue'
+import EnterCode from '@/views/EnterCode/EnterCode.vue'
 
 const routes = [
   {
@@ -71,6 +72,12 @@ const routes = [
     path: '/pagamento',
     name: 'Payment',
     component: Payment,
+    meta: { roles: ['admin'] }
+  },
+  {
+    path: '/inserir-codigo',
+    name: 'EnterCode',
+    component: EnterCode,
     meta: { roles: ['admin'] }
   },
 ]
