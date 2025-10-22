@@ -1,6 +1,6 @@
 <template>
-  <div class="auth-background">
-    <div class="auth-container login">
+  <div class="auth-background" @click="goBack">
+    <div class="auth-container login" @click.stop>
       <div class="auth-side left">
         <img src="/images/logo.png" alt="Logo" class="logo" />
       </div>
@@ -42,7 +42,6 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-
 const email = ref('')
 const errorMessage = ref('')
 const successMessage = ref('')
@@ -58,6 +57,7 @@ async function handlePasswordReset() {
   try {
     successMessage.value = 'Link de redefinição enviado com sucesso!'
     errorMessage.value = ''
+    router.push('/inserir-codigo')
   } catch (error) {
     errorMessage.value = 'Erro ao enviar o link. Verifique o e-mail informado.'
     successMessage.value = ''
@@ -65,9 +65,10 @@ async function handlePasswordReset() {
 }
 
 function goBack() {
-  router.push('/login')
+  router.push('/')
 }
 </script>
+
 
 <style scoped src="./ForgotPassword.css"></style>
 

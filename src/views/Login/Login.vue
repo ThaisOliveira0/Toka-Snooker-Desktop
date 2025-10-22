@@ -1,37 +1,36 @@
 <template>
-  <div class="auth-background">
-  <div class="auth-container login">
-    <div class="auth-side left">
-      <img src="/images/logo.png" alt="Logo" class="logo" />
-    </div>
+  <div class="auth-background" @click="goBack">
+    <div class="auth-container login" @click.stop>
+      <div class="auth-side left">
+        <img src="/images/logo.png" alt="Logo" class="logo" />
+      </div>
 
-    <div class="auth-side right">
-      <form class="auth-form">
-        <button class="back-button" @click="goBack">
-          ← Voltar
-        </button>
+      <div class="auth-side right">
+        <form class="auth-form">
+          <button class="back-button" @click.prevent="goBack">
+            ← Voltar
+          </button>
+          <h2>Login</h2>
+          <div class="avatar">
+            <i class="fas fa-user"></i>
+          </div>
 
-        <h2>Login</h2>
-        <div class="avatar">
-          <i class="fas fa-user"></i>
-        </div>
+          <input type="email" placeholder="E-mail" v-model="email" />
+          <input type="password" placeholder="Senha" v-model="senha" />
 
-        <input type="email" placeholder="E-mail" v-model="email" />
-        <input type="password" placeholder="Senha" v-model="senha" />
+          <button class="auth-button" @click.prevent="handleLogin">
+            Entrar
+          </button>
 
-        <button class="auth-button" @click.prevent="handleLogin">
-          Entrar
-        </button>
+          <a href="/esqueci-senha" class="forgot-password">Esqueci minha senha</a>
 
-        <a href="/esqueci-senha" class="forgot-password">Esqueci minha senha</a>
+          <p class="signup-text">
+            Novo por aqui? <router-link to="/cadastro">Cadastre-se!</router-link>
+          </p>
 
-        <p class="signup-text">
-          Novo por aqui? <router-link to="/cadastro">Cadastre-se!</router-link>
-        </p>
-
-        <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
-      </form>
-    </div>
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -58,9 +57,11 @@ async function handleLogin() {
     errorMessage.value = 'Login falhou. Verifique seus dados.'
   }
 }
+
 function goBack() {
-  router.push('/') 
+  router.push('/')
 }
 </script>
+
 
 <style scoped src="./Login.css"></style>

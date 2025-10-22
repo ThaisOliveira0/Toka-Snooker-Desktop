@@ -40,7 +40,7 @@ const routes = [
     component: ForgotPassword
   },
   {
-    path: '/nova-senha',
+    path: '/redefinir-senha',
     name: 'ResetPassword',
     component: ResetPassword
   },

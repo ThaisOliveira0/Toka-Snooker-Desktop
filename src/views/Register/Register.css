@@ -1,4 +1,18 @@
-.auth-container {
+.register-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(200, 200, 200, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(8px);
+  z-index: 0;
+}
+
+.register-container {
   display: flex;
   width: 900px;
   height: 520px;
@@ -7,71 +21,55 @@
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
   background: #fff;
-}
-
-.auth-background {
-  position: fixed; 
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(200, 200, 200, 0.5); 
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  backdrop-filter: blur(8px); 
-  z-index: 0; 
-}
-
-.auth-container.register {
   flex-direction: row-reverse;
+  animation: fadeIn 0.6s ease;
 }
 
-.auth-container.register .auth-side.left {
+.register-side {
+  flex: 1 1 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  transition: all 0.6s ease;
+}
+
+.register-side.left {
   background-color: #ffffff !important;
 }
 
-
-.auth-container.register .auth-side.right {
+.register-side.right {
   background: linear-gradient(135deg, #2e7d32, #66bb6a) !important;
 }
 
-.auth-side .logo {
+.register-logo {
   width: 200px;
   height: auto;
   filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.2));
   transition: transform 0.8s ease;
 }
 
-.auth-side {
-  flex: 1 1 50%; 
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-}
-
-.auth-form {
+.register-form {
   width: 80%;
   max-width: 350px;
   text-align: center;
 }
 
-.auth-form h2 {
+.register-form h2 {
   font-size: 24px;
   color: #2e7d32;
   margin-bottom: 20px;
   font-weight: 600;
 }
 
-.auth-form .avatar {
+.register-avatar {
   font-size: 40px;
   color: #4caf50;
   margin-bottom: 20px;
 }
 
-.auth-form input,
-.auth-form select {
+.register-form input,
+.register-form select {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
@@ -80,14 +78,14 @@
   transition: all 0.3s ease;
 }
 
-.auth-form input:focus,
-.auth-form select:focus {
+.register-form input:focus,
+.register-form select:focus {
   border-color: #4caf50;
   box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
   outline: none;
 }
 
-.auth-button {
+.register-button {
   width: 100%;
   padding: 12px;
   background-color: #2e7d32;
@@ -99,35 +97,25 @@
   transition: all 0.3s ease;
 }
 
-.auth-button:hover {
+.register-button:hover {
   background-color: #27632a;
   transform: translateY(-2px);
 }
 
-.signup-text {
+.register-text {
   margin-top: 20px;
   font-size: 14px;
   color: #555;
 }
 
-.signup-text a {
+.register-text a {
   color: #2e7d32;
   text-decoration: none;
   font-weight: 500;
 }
 
-.signup-text a:hover {
+.register-text a:hover {
   text-decoration: underline;
-}
-
-.error-message {
-  color: #d32f2f;
-  font-size: 14px;
-  margin-top: 10px;
-}
-
-.auth-container {
-  animation: fadeIn 0.6s ease;
 }
 
 @keyframes fadeIn {
