@@ -1,6 +1,6 @@
 <template>
-  <div class="register-background">
-    <div class="register-container">
+  <div class="register-background" @click="handleBackgroundClick">
+    <div class="register-container" @click.stop>
       <div class="register-side right">
         <img src="/images/logo.png" alt="Logo" class="register-logo" />
       </div>
@@ -64,7 +64,7 @@ async function handleRegister() {
   try {
     loading.value = true
     await register(nome.value, email.value, telefone.value, senha.value, tipo_usuario.value)
-    sucesso.value = "Cadastro realizado com sucesso! Redirecionando..."
+    sucesso.value = "Cadastro realizado com sucesso!"
 
     setTimeout(() => {
       router.push("/login")
@@ -74,6 +74,10 @@ async function handleRegister() {
   } finally {
     loading.value = false
   }
+}
+
+function handleBackgroundClick() {
+  router.push("/")
 }
 </script>
 
