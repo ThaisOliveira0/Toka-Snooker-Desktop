@@ -2,63 +2,70 @@
   <div class="inventory-control">
     <header class="inventory-header">
       <h2>Controle de Estoque</h2>
+      <button class="add-btn" @click="openModal()">+ Adicionar Produto</button>
     </header>
 
     <main class="inventory-content">
       <section class="inventory-list">
         <div class="inventory-actions">
-          <input
-            type="text"
-            v-model="searchQuery"
-            placeholder="Buscar produto..."
-          />
+          <input type="text" v-model="searchQuery" placeholder="Buscar produto..." />
           <select v-model="selectedCategory">
             <option value="">Todas Categorias</option>
             <option v-for="cat in categories" :key="cat" :value="cat">
               {{ cat }}
             </option>
           </select>
-          <button class="add-btn" @click="openModal()">
-            + Adicionar Produto
-          </button>
         </div>
 
-        <table class="inventory-table">
-          <thead>
-            <tr>
-              <th>Produto</th>
-              <th>Categoria</th>
-              <th>Preço (R$)</th>
-              <th>Estoque</th>
-              <th>Ações</th>
-            </tr>
-          </thead>
+        <div class="table-container">
+          <table class="modern-table">
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Preço (R$)</th>
+                <th>Estoque</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in filteredItems" :key="item.id" :class="{ 'low-stock-row': item.estoque <= 5 }">
+                <td>
+                  <div class="product-cell">
+                    <span class="product-name">{{ item.nome }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="category-tag">{{ item.categoria }}</span>
+                </td>
+                <td>R$ {{ (item.preco ?? 0).toFixed(2) }}</td>
+                <td>
+                  <div class="stock-bar">
+                    <div class="bar-fill" :style="{
+                      width: Math.min(item.estoque * 10, 100) + '%',
+                      background: item.estoque <= 5 ? '#e74c3c' : '#4caf50'
+                    }"></div>
+                  </div>
+                  <span class="stock-value">{{ item.estoque }}</span>
+                </td>
+                <td class="actions">
+                  <button class="edit-btn" @click="openModal(item)">
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button class="remove-btn" @click="requestDelete(item)">
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </td>
+              </tr>
 
-          <tbody>
-            <tr
-              v-for="item in filteredItems"
-              :key="item.id"
-              :class="{ 'low-stock': item.estoque <= 5 }"
-            >
-              <td>{{ item.nome }}</td>
-              <td>{{ item.categoria }}</td>
-              <td>{{ (item.preco ?? 0).toFixed(2) }}</td>
-              <td>{{ item.estoque }}</td>
-              <td class="action-icons">
-                <button class="edit-btn" @click="openModal(item)">
-                  <i class="fas fa-edit"></i>
-                </button>
-                <button class="remove-btn" @click="requestDelete(item)">
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-              </td>
-            </tr>
-
-            <tr v-if="filteredItems.length === 0">
-              <td colspan="5" class="no-results">Nenhum produto encontrado</td>
-            </tr>
-          </tbody>
-        </table>
+              <tr v-if="filteredItems.length === 0">
+                <td colspan="5" class="no-results">
+                  Nenhum produto encontrado
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </section>
 
       <aside class="inventory-summary">
@@ -71,11 +78,7 @@
           <span>Valor Total em Estoque</span>
           <span>R$ {{ totalValue.toFixed(2) }}</span>
         </div>
-        <div
-          class="summary-item"
-          :class="{ active: showLowStockOnly }"
-          @click="filterLowStock"
-        >
+        <div class="summary-item clickable" :class="{ active: showLowStockOnly }" @click="filterLowStock">
           <span>Itens com Estoque Baixo</span>
           <span>{{ lowStockCount }}</span>
         </div>
@@ -105,13 +108,8 @@
       </div>
     </div>
 
-    <ConfirmModal
-      :show="showConfirm"
-      title="Excluir Produto"
-      message="Tem certeza que deseja excluir este produto?"
-      @close="showConfirm = false"
-      @confirm="handleConfirmDelete"
-    />
+    <ConfirmModal :show="showConfirm" title="Excluir Produto" message="Tem certeza que deseja excluir este produto?"
+      @close="showConfirm = false" @confirm="handleConfirmDelete" />
   </div>
 </template>
 
