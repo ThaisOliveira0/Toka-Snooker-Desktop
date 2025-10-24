@@ -1,82 +1,233 @@
-
 .report-page {
-  padding: 2rem;
-  background: radial-gradient(circle at top left, #0a1005, #061105);
   min-height: 100vh;
-  color: #e0e6ed;
+  padding: 24px;
   font-family: 'Inter', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
 }
 
-.report-page h1 {
-  font-size: 2rem;
-  font-weight: 700;
-  margin-bottom: 2rem;
-  color: #f0fdf4;
-  text-shadow: 0 0 12px rgba(0, 255, 0, 0.5);
+.report-header{
+  background-color: #305532;
+  color: #fff;
+  padding: 20px 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+  font-size: 24px;
+  margin-top: 0;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.report-filters {
+  display: flex;
+  gap: 1rem;
+  margin-left: 40px;
+}
+
+.report-filters select {
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: #69a16c;
+  background-color: #5d9160;
+  color: #ffffff;
+  font-weight: 500;
+  appearance: none;
+  cursor: pointer;
+  background-image: url('data:image/svg+xml;utf8,<svg fill="%23333" height="10" viewBox="0 0 24 24" width="10" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 10px;
+  transition: 0.3s;
+}
+
+.report-filters select:hover {
+  border-color: #4caf50;
 }
 
 .cards-container {
   display: flex;
-  justify-content: space-between !important; 
-  flex-wrap: wrap;              
-  gap: 1.8rem;                    
-  margin-bottom: 2.5rem;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  margin-left: 30px;
+}
+
+.report-card {
+  flex: 1 1 200px;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.report-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.report-card span {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #305532;
+}
+
+.report-card strong {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #222;
 }
 
 .chart-container {
-  background: linear-gradient(145deg, #1f4c1f, #2e6332);
+  background-color: #fff;
   padding: 2rem;
-  border-radius: 1rem;
-  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+  border: 1px solid #4caf50;
 }
 
-.card{
-  background-color: #2b6830;
-}
 :deep(.card) {
-  background: linear-gradient(145deg, #2e6332, #1f4c1f) !important;
+  flex: 1 1 200px;
+  background: linear-gradient(145deg, #e8f5e9, #dcedc8);
+  border: 2px solid #2e7d32;
+  border-radius: 12px;
   padding: 1.5rem;
-  border-radius: 1rem;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #e0e6ed;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  color: #2e7d32;
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 :deep(.card:hover) {
   transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 255, 0, 0.35);
+  box-shadow: 0 8px 25px rgba(46, 125, 50, 0.35);
 }
 
 :deep(.card-title) {
   font-size: 1.1rem;
   font-weight: 600;
-  color: #a3d09c;
   margin-bottom: 0.5rem;
-  text-shadow: 0 0 4px rgba(0, 255, 0, 0.3);
 }
 
 :deep(.card-value) {
   font-size: 1.8rem;
   font-weight: bold;
-  color: #d9f0d9;
+}
+
+.chart-container {
+  background: #fff;
+  border: 2px solid #2e7d32;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  margin-bottom: 2rem;
+  position: relative;
+  margin-left: 2.5rem;
+  margin-right: 2.5rem ;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  justify-content: flex-start;
+}
+
+.chart-controls select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #2e7d32;
+  background-color: #f5f7fa;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.table-container {
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid #2e7d32;
+  box-shadow: 0 4px 12px hwb(0 0% 100% / 0.08);
+  padding: 1rem;
+  margin-bottom: 2rem;
+}
+
+.modern-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem;
+}
+
+.modern-table th {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+  padding: 0.8rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.modern-table td {
+  background-color: #f5f7fa;
+  color: #333;
+  padding: 0.8rem;
+}
+
+.modern-table tbody tr:hover {
+  background-color: #e0f2f1;
+}
+
+.modern-table td.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 :deep(.chart-line) {
-  stroke: #7ee787;
+  stroke: #2e7d32;
   stroke-width: 3px;
 }
 
 :deep(.chart-point) {
-  fill: #c0f2c0;
+  fill: #4caf50;
   stroke: #ffffff44;
   stroke-width: 1.5px;
 }
 
 :deep(.chart-label) {
-  fill: #e0e6ed;
+  fill: #333;
   font-weight: 500;
   font-size: 0.9rem;
 }
 
+@media (max-width: 992px) {
+  .cards-container {
+    justify-content: center;
+  }
+
+  .chart-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .chart-container {
+    padding: 1.5rem;
+  }
+
+  .modern-table th, .modern-table td {
+    padding: 0.6rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .cards-container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

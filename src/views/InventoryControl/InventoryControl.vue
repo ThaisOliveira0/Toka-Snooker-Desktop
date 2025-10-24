@@ -8,7 +8,11 @@
     <main class="inventory-content">
       <section class="inventory-list">
         <div class="inventory-actions">
-          <input type="text" v-model="searchQuery" placeholder="Buscar produto..." />
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Buscar produto..."
+          />
           <select v-model="selectedCategory">
             <option value="">Todas Categorias</option>
             <option v-for="cat in categories" :key="cat" :value="cat">
@@ -17,7 +21,7 @@
           </select>
         </div>
 
-        <div class="table-container">
+        <div class="table-container-inventory">
           <table class="modern-table">
             <thead>
               <tr>
@@ -29,7 +33,11 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="item in filteredItems" :key="item.id" :class="{ 'low-stock-row': item.estoque <= 5 }">
+              <tr
+                v-for="item in filteredItems"
+                :key="item.id"
+                :class="{ 'low-stock-row': item.estoque <= 5 }"
+              >
                 <td>
                   <div class="product-cell">
                     <span class="product-name">{{ item.nome }}</span>
@@ -40,14 +48,20 @@
                 </td>
                 <td>R$ {{ (item.preco ?? 0).toFixed(2) }}</td>
                 <td>
-                  <div class="stock-bar">
-                    <div class="bar-fill" :style="{
-                      width: Math.min(item.estoque * 10, 100) + '%',
-                      background: item.estoque <= 5 ? '#e74c3c' : '#4caf50'
-                    }"></div>
+                  <div class="stock-wrapper">
+                    <div class="stock-bar">
+                      <div
+                        class="bar-fill"
+                        :style="{
+                          width: Math.min((item.estoque / 40) * 100, 100) + '%',
+                          background: item.estoque <= 5 ? '#e74c3c' : '#4caf50',
+                        }"
+                      ></div>
+                    </div>
+                    <span class="stock-value">{{ item.estoque }}</span>
                   </div>
-                  <span class="stock-value">{{ item.estoque }}</span>
                 </td>
+
                 <td class="actions">
                   <button class="edit-btn" @click="openModal(item)">
                     <i class="fas fa-edit"></i>
@@ -78,7 +92,11 @@
           <span>Valor Total em Estoque</span>
           <span>R$ {{ totalValue.toFixed(2) }}</span>
         </div>
-        <div class="summary-item clickable" :class="{ active: showLowStockOnly }" @click="filterLowStock">
+        <div
+          class="summary-item clickable"
+          :class="{ active: showLowStockOnly }"
+          @click="filterLowStock"
+        >
           <span>Itens com Estoque Baixo</span>
           <span>{{ lowStockCount }}</span>
         </div>
@@ -89,27 +107,60 @@
       <div class="modal-content">
         <h3>{{ editingItem ? "Editar Produto" : "Novo Produto" }}</h3>
 
-        <label>Nome</label>
-        <input v-model="form.nome" type="text" />
+        <div class="form-group">
+          <label>Nome</label>
+          <input
+            v-model="form.nome"
+            type="text"
+            placeholder="Digite o nome do produto"
+          />
+        </div>
 
-        <label>Categoria</label>
-        <input v-model="form.categoria" type="text" />
+        <div class="form-group">
+          <label>Categoria</label>
+          <input
+            v-model="form.categoria"
+            type="text"
+            placeholder="Ex: Bebidas, Lanches..."
+          />
+        </div>
 
-        <label>Preço (R$)</label>
-        <input v-model.number="form.preco" type="number" min="0" />
+        <div class="form-group">
+          <label>Preço (R$)</label>
+          <input
+            v-model.number="form.preco"
+            type="number"
+            min="0"
+            placeholder="0.00"
+          />
+        </div>
 
-        <label>Quantidade em Estoque</label>
-        <input v-model.number="form.estoque" type="number" min="0" />
+        <div class="form-group">
+          <label>Quantidade em Estoque</label>
+          <input
+            v-model.number="form.estoque"
+            type="number"
+            min="0"
+            placeholder="0"
+          />
+        </div>
 
         <div class="modal-actions">
-          <button @click="saveItem">Salvar</button>
           <button class="cancel-btn" @click="closeModal">Cancelar</button>
+          <button class="save-btn" @click="saveItem">
+            {{ editingItem ? "Atualizar" : "Salvar" }}
+          </button>
         </div>
       </div>
     </div>
 
-    <ConfirmModal :show="showConfirm" title="Excluir Produto" message="Tem certeza que deseja excluir este produto?"
-      @close="showConfirm = false" @confirm="handleConfirmDelete" />
+    <ConfirmModal
+      :show="showConfirm"
+      title="Excluir Produto"
+      message="Tem certeza que deseja excluir este produto?"
+      @close="showConfirm = false"
+      @confirm="handleConfirmDelete"
+    />
   </div>
 </template>
 
@@ -171,24 +222,23 @@ onMounted(async () => {
     console.error("Erro ao carregar produtos:", error);
   }
 });
-const showLowStockOnly = ref(false)
+const showLowStockOnly = ref(false);
 
 const filterLowStock = () => {
-  showLowStockOnly.value = !showLowStockOnly.value
-}
+  showLowStockOnly.value = !showLowStockOnly.value;
+};
 
 const filteredItems = computed(() => {
   return items.value.filter((i) => {
     const matchSearch =
       !searchQuery.value ||
-      i.nome.toLowerCase().includes(searchQuery.value.toLowerCase())
+      i.nome.toLowerCase().includes(searchQuery.value.toLowerCase());
     const matchCategory =
-      !selectedCategory.value || i.categoria === selectedCategory.value
-    const matchLowStock = !showLowStockOnly.value || i.estoque <= 5
-    return matchSearch && matchCategory && matchLowStock
-  })
-})
-
+      !selectedCategory.value || i.categoria === selectedCategory.value;
+    const matchLowStock = !showLowStockOnly.value || i.estoque <= 5;
+    return matchSearch && matchCategory && matchLowStock;
+  });
+});
 
 const categories = computed(() => [
   ...new Set(items.value.map((i) => i.categoria)),
@@ -236,7 +286,6 @@ const saveItem = async () => {
     closeModal();
   } catch (error) {
     console.error("Erro ao salvar item:", error);
-    alert("Erro ao salvar o produto.");
   }
 };
 
@@ -252,7 +301,6 @@ const handleConfirmDelete = async () => {
     items.value = items.value.filter((i) => i.id !== itemToDelete.value.id);
   } catch (error) {
     console.error("Erro ao excluir item:", error);
-    alert("Erro ao excluir produto.");
   } finally {
     showConfirm.value = false;
     itemToDelete.value = null;
