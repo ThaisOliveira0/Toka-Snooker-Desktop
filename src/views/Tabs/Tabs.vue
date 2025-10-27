@@ -24,19 +24,30 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
 import { useRouter } from "vue-router"; 
 import TableCard from "@/components/TableCard.vue";
-import { orders } from "@/mock/orders.js";
+import { onMounted, ref, computed } from "vue";
+import orderService from "../../service/ordersService";
 
-const cardsContainer = ref(null);
-const search = ref(""); 
+const comandas = ref([]);
+const search = ref("");
 const router = useRouter();
+const cardsContainer = ref(null);
 
-const pedidosAdaptados = computed(() =>
-  orders.map(comanda => ({
-    mesa: `Mesa ${comanda.mesa.toString().padStart(2, "0")}`,
-    pedido: (comanda.pedido || []).map(p => ({
+onMounted(async () => {
+  try {
+    const response = await orderService.getAllComandas(); 
+    comandas.value = response || []; 
+    console.log("Comandas recebidas:", comandas.value);
+  } catch (err) {
+    console.error("Erro ao buscar comandas:", err);
+  }
+});
+
+const orders = computed(() =>
+  comandas.value.map(comanda => ({
+    mesa: `Mesa ${comanda.mesa?.toString().padStart(2, "0")}`,
+    pedido: (comanda.items_pedido || []).map(p => ({
       nome: p.nome,
       quantidade: p.quantidade,
       valor_total: p.valor_total
@@ -49,15 +60,16 @@ const pedidosAdaptados = computed(() =>
   }))
 );
 
+
 const filteredOrders = computed(() => {
-  if (!search.value.trim()) return pedidosAdaptados.value;
+  if (!search.value.trim()) return orders.value;
   const query = search.value.toLowerCase();
-  return pedidosAdaptados.value.filter(comanda =>
-    String(comanda.mesa).toLowerCase().includes(query)
+  return orders.value.filter(c =>
+    String(c.mesa).toLowerCase().includes(query)
   );
 });
 
-const handleClose = (comanda) => {
+function handleClose(comanda) {
   const safeComanda = {
     mesa: comanda.mesa || "Mesa desconhecida",
     pedido: (comanda.pedido || []).map(p => ({
@@ -74,7 +86,8 @@ const handleClose = (comanda) => {
 
   sessionStorage.setItem("selectedOrder", JSON.stringify(safeComanda));
   router.push({ name: "Payment" });
-};
+}
+
 </script>
 
 
