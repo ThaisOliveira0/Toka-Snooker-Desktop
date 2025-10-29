@@ -11,6 +11,7 @@ import InventoryControl from '@/views/InventoryControl/InventoryControl.vue'
 import Home from '@/views/Home/Home.vue'
 import Payment from '@/views/Payment/Payment.vue'
 import EnterCode from '@/views/EnterCode/EnterCode.vue'
+import KitchenOrders from '@/views/KitchenOrders/KitchenOrders.vue'
 
 const routes = [
   {
@@ -78,6 +79,12 @@ const routes = [
     path: '/inserir-codigo',
     name: 'EnterCode',
     component: EnterCode,
+    meta: { roles: ['admin'] }
+  },
+  {
+    path: '/cozinha',
+    name: 'KitchenOrders',
+    component: KitchenOrders,
     meta: { roles: ['admin'] }
   },
 ]

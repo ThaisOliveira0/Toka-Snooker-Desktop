@@ -16,6 +16,7 @@ const allTabs = [
   { name: 'Relatórios', path: '/relatorios', roles: ['ADMIN'] },
   { name: 'Cadastro', path: '/cadastro' ,roles: ['ADMIN']},
   { name: 'Estoque', path: '/estoque', roles: ['ADMIN', 'FUNCIONARIO'] },
+  { name: 'Cozinha', path: '/cozinha', roles: ['ADMIN', 'FUNCIONARIO'] },
   // { name: 'Pagamento', path: '/pagamento', roles: ['ADMIN', 'FUNCIONARIO'] },
 ]
 
