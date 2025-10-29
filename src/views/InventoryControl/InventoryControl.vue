@@ -179,49 +179,31 @@ const form = ref({
   nome: "",
   categoria: "",
   preco: 0,
-  estoque: 0,
+  qtde_estoque: 0,
 });
 
 const showConfirm = ref(false);
 const itemToDelete = ref(null);
 
-const mockItems = [
-  { id: 1, nome: "X-Burguer", categoria: "Lanches", preco: 12.5, estoque: 10 },
-  {
-    id: 2,
-    nome: "Coca-Cola 350ml",
-    categoria: "Bebidas",
-    preco: 5.0,
-    estoque: 3,
-  },
-  {
-    id: 3,
-    nome: "Sorvete Chocolate",
-    categoria: "Sobremesas",
-    preco: 8.0,
-    estoque: 2,
-  },
-  {
-    id: 4,
-    nome: "Pizza Calabresa",
-    categoria: "Lanches",
-    preco: 35.0,
-    estoque: 6,
-  },
-];
-
 onMounted(async () => {
   try {
-    const response = await orderService.getAllProdutos();
-    if (Array.isArray(response.data) && response.data.length) {
-      items.value = response.data;
+    const data = await orderService.getInventory();
+    if (Array.isArray(data) && data.length) {
+      items.value = data.map(i => ({
+        ...i,
+        preco: i.preco_unit,
+        estoque: i.qtde_estoque
+      }));
     } else {
       items.value = mockItems;
     }
   } catch (error) {
     console.error("Erro ao carregar produtos:", error);
+    items.value = mockItems;
   }
 });
+
+
 const showLowStockOnly = ref(false);
 
 const filterLowStock = () => {

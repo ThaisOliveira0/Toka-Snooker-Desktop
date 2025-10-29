@@ -6,8 +6,8 @@
       </div>
 
       <div class="auth-side right">
-        <form class="auth-form">
-          <button class="back-button" @click="goBack">
+        <form class="auth-form" @submit.prevent="handlePasswordReset">
+          <button class="back-button" @click.prevent="goBack">
             ← Voltar
           </button>
 
@@ -17,17 +17,13 @@
           </div>
 
           <p class="info-text">
-            Digite o e-mail cadastrado para receber o link de redefinição de senha.
+            Digite o e-mail cadastrado para receber o código de redefinição de senha.
           </p>
 
-          <input
-            type="email"
-            placeholder="E-mail"
-            v-model="email"
-          />
+          <input type="email" placeholder="E-mail" v-model="email" />
 
-          <button class="auth-button" @click.prevent="handlePasswordReset">
-            Enviar link
+          <button class="auth-button" type="submit">
+            Enviar código
           </button>
 
           <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
@@ -41,26 +37,35 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { sendCode } from '@/service/authService.js'
 
 const email = ref('')
-const errorMessage = ref('')
 const successMessage = ref('')
+const errorMessage = ref('')
 const router = useRouter()
 
 async function handlePasswordReset() {
+  errorMessage.value = ''
+  successMessage.value = ''
+
   if (!email.value) {
     errorMessage.value = 'Por favor, insira seu e-mail.'
-    successMessage.value = ''
     return
   }
 
   try {
-    successMessage.value = 'Link de redefinição enviado com sucesso!'
-    errorMessage.value = ''
-    router.push('/inserir-codigo')
+    const response = await sendCode(email.value)
+    
+    if (response) {
+      successMessage.value = response.message || 'Código enviado com sucesso!'
+      sessionStorage.setItem('recoveryEmail', email.value)
+      router.push('/inserir-codigo')
+    } else {
+      errorMessage.value = response.message || 'Erro ao enviar o código.'
+    }
   } catch (error) {
-    errorMessage.value = 'Erro ao enviar o link. Verifique o e-mail informado.'
-    successMessage.value = ''
+    console.error(error)
+    errorMessage.value = 'Erro no servidor. Tente novamente mais tarde.'
   }
 }
 
@@ -69,6 +74,4 @@ function goBack() {
 }
 </script>
 
-
 <style scoped src="./ForgotPassword.css"></style>
-

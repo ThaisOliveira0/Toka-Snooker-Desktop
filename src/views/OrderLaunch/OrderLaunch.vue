@@ -111,8 +111,9 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
-import orderService from '../../service/ordersService'
+import orderService from '../../service/ordersService.js'
 import './orderLaunch.css'
+import productService from '../../service/productService.js'
 
 const tableNumber = ref('')
 const customerName = ref('')
@@ -126,7 +127,7 @@ const tabs = computed(() => {
 
 onMounted(async () => {
   try {
-    const response = await orderService.getAllProdutos()
+    const response = await productService.getAllProdutos()
 
     const produtos = response.data
 
@@ -155,7 +156,6 @@ items.value = produtos.map(p => {
   }
 })
 
-// Filtros e cálculos
 const filteredItems = computed(() => 
   items.value.filter(i => i.category === activeTab.value)
 )
@@ -173,8 +173,37 @@ const cartTotal = computed(() =>
   cart.value.reduce((sum, i) => sum + i.price * i.quantity, 0)
 )
 
-const confirmOrder = () => {
-  alert(`Pedido da mesa ${tableNumber.value || '?'} confirmado!`)
-  items.value.forEach(i => (i.quantity = 0))
-}
+const confirmOrder = async () => {
+  if (!tableNumber.value || !customerName.value) {
+    return alert("Informe o número da mesa e o nome do cliente.");
+  }
+
+  if (cart.value.length === 0) {
+    return alert("Adicione pelo menos um item ao pedido.");
+  }
+
+  const novoPedido = {
+    mesa: tableNumber.value,
+    cliente: customerName.value,
+    itens: cart.value.map(i => ({
+      produto_id: i.id,
+      quantidade: i.quantity,
+      preco_unit: i.price
+    })),
+    total: cartTotal.value
+  };
+
+  try {
+    const resultado = await orderService.createPedido(novoPedido);
+    alert(`Pedido da mesa ${tableNumber.value} criado com sucesso!`);
+
+    tableNumber.value = "";
+    customerName.value = "";
+    items.value.forEach(i => (i.quantity = 0));
+  } catch (error) {
+    console.error("Erro ao criar pedido:", error);
+    alert("Não foi possível criar o pedido.");
+  }
+};
+
 </script>

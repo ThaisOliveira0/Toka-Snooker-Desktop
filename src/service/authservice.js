@@ -57,3 +57,19 @@ export function getDecodedToken() {
 export function logout() {
   sessionStorage.removeItem('token');
 }
+
+export async function sendCode(email) {
+  const response = await axios.post(`${API_URL}/login/recuperacao`, { email })
+  return response.data
+}
+
+export async function verifyCode(email, codigo) {
+  const response = await axios.post(`${API_URL}/login/verificar-codigo`, { email, codigo })
+  return response.data
+}
+
+export async function resetPassword(id, senha) {
+  const response = await axios.put(`${API_URL}/login/alterar-senha/${id}`, { senha })
+  return response.data
+}
+

@@ -17,16 +17,8 @@
             Digite e confirme sua nova senha para concluir a redefinição.
           </p>
 
-          <input
-            type="password"
-            placeholder="Nova senha"
-            v-model="novaSenha"
-          />
-          <input
-            type="password"
-            placeholder="Confirmar nova senha"
-            v-model="confirmarSenha"
-          />
+          <input type="password" placeholder="Nova senha" v-model="novaSenha" />
+          <input type="password" placeholder="Confirmar nova senha" v-model="confirmarSenha" />
 
           <button class="reset-button" type="submit">
             Redefinir senha
@@ -43,6 +35,7 @@
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
+import { resetPassword } from "@/service/authService.js"
 
 const router = useRouter()
 
@@ -50,6 +43,8 @@ const novaSenha = ref("")
 const confirmarSenha = ref("")
 const successMessage = ref("")
 const errorMessage = ref("")
+const userId = sessionStorage.getItem('recoveryUserId')
+
 
 async function handleResetPassword() {
   errorMessage.value = ""
@@ -66,9 +61,18 @@ async function handleResetPassword() {
   }
 
   try {
-    successMessage.value = "Senha redefinida com sucesso!"
-    setTimeout(() => router.push("/login"), 2000)
+    const response = await resetPassword(userId, novaSenha.value)
+    if (response.sucesso) {
+      successMessage.value = response.mensagem || "Senha redefinida com sucesso!"
+
+      sessionStorage.removeItem('recoveryUserId')
+      sessionStorage.removeItem('recoveryEmail')
+      router.push("/login")
+    } else {
+      errorMessage.value = response.mensagem || "Erro ao redefinir senha."
+    }
   } catch (err) {
+    console.error("Erro ao redefinir senha:", err)
     errorMessage.value = "Erro ao redefinir senha. Tente novamente."
   }
 }
