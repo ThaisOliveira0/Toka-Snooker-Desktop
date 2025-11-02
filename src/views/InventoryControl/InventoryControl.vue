@@ -168,7 +168,7 @@
 import { ref, computed, onMounted } from "vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import "./inventoryControl.css";
-import orderService from "../../service/ordersService";
+import inventoryService from "../../service/inventoryService";
 
 const searchQuery = ref("");
 const selectedCategory = ref("");
@@ -184,24 +184,21 @@ const form = ref({
 
 const showConfirm = ref(false);
 const itemToDelete = ref(null);
-
 onMounted(async () => {
   try {
-    const data = await orderService.getInventory();
-    if (Array.isArray(data) && data.length) {
+    const data = await inventoryService.getInventory();
+    if (Array.isArray(data)) {
       items.value = data.map(i => ({
         ...i,
         preco: i.preco_unit,
-        estoque: i.qtde_estoque
+        estoque: i.qtde_estoque,
       }));
-    } else {
-      items.value = mockItems;
     }
   } catch (error) {
     console.error("Erro ao carregar produtos:", error);
-    items.value = mockItems;
   }
 });
+
 
 
 const showLowStockOnly = ref(false);
@@ -256,20 +253,32 @@ const closeModal = () => {
 const saveItem = async () => {
   if (!form.value.nome.trim()) return alert("Informe o nome do produto.");
 
+  const payload = {
+    nome: form.value.nome,
+    categoria: form.value.categoria,
+    preco_unit: form.value.preco_unit,
+    qtde_estoque: form.value.qtde_estoque,
+  };
+
   try {
     if (editingItem.value) {
-      await orderService.updateProduto(editingItem.value.id, form.value);
+      await inventoryService.updateItem(editingItem.value.id, payload);
       const index = items.value.findIndex((i) => i.id === editingItem.value.id);
-      items.value[index] = { ...editingItem.value, ...form.value };
+      items.value[index] = { ...items.value[index], ...form.value };
     } else {
-      const newItem = await orderService.createProduto(form.value);
-      items.value.push(newItem);
+      const newItem = await inventoryService.createItem(payload);
+      items.value.push({
+        ...newItem,
+        preco: newItem.preco_unit,
+        estoque: newItem.qtde_estoque,
+      });
     }
     closeModal();
   } catch (error) {
     console.error("Erro ao salvar item:", error);
   }
 };
+
 
 const requestDelete = (item) => {
   itemToDelete.value = item;
@@ -279,7 +288,7 @@ const requestDelete = (item) => {
 const handleConfirmDelete = async () => {
   if (!itemToDelete.value) return;
   try {
-    await orderService.deleteProduto(itemToDelete.value.id);
+    await inventoryService.deleteItem(itemToDelete.value.id);
     items.value = items.value.filter((i) => i.id !== itemToDelete.value.id);
   } catch (error) {
     console.error("Erro ao excluir item:", error);

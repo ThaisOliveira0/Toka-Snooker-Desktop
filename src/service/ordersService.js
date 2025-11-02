@@ -11,15 +11,7 @@ const api = axios.create({
 
 export default {
 
-async getInventory() {
-  try {
-    const response = await api.get("/ingredientes")
-    return response.data
-  } catch (error) {
-    console.error('Erro ao buscar estoque:', error)
-    return { data: [] }  
-  }
-},
+
 async getAllComandas() {
     try {
       const response = await api.get("/comandas");
