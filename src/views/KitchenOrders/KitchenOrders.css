@@ -6,7 +6,7 @@
 }
 
 .kitchen-header {
-  background-color: #305532;
+  background-color: #305532 !important;
   color: #fff;
   padding: 16px 24px;
   border-radius: 8px;
@@ -91,14 +91,14 @@
   text-decoration: line-through;
 }
 
-.order-header {
+.kitchen-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
   margin-bottom: 0.5rem;
   font-size: 1rem;
-  background-color: #788188;
+  background-color: #305532;
 }
 
 .order-number {
@@ -122,7 +122,6 @@
   font-weight: 600;
   color: #555;
 }
-
 
 .order-items {
   list-style: none;

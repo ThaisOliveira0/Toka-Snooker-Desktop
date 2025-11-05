@@ -2,7 +2,14 @@
   <div class="inventory-control">
     <header class="inventory-header">
       <h2>Controle de Estoque</h2>
-      <button class="add-btn" @click="openModal()">+ Adicionar Produto</button>
+      <div class="header-actions">
+        <button class="add-btn" @click="openModal()">
+          + Adicionar Produto
+        </button>
+        <button class="stockWithdrawal" @click="openWithdrawal()">
+          Retirar Itens
+        </button>
+      </div>
     </header>
 
     <main class="inventory-content">
@@ -36,7 +43,9 @@
               <tr
                 v-for="item in filteredItems"
                 :key="item.id"
-                :class="{ 'low-stock-row': item.estoque <= 5 }"
+                :class="{
+                  'low-stock-row': item.estoque <= (item.qtde_minima ?? 5),
+                }"
               >
                 <td>
                   <div class="product-cell">
@@ -54,7 +63,10 @@
                         class="bar-fill"
                         :style="{
                           width: Math.min((item.estoque / 40) * 100, 100) + '%',
-                          background: item.estoque <= 5 ? '#e74c3c' : '#4caf50',
+                          background:
+                            item.estoque <= (item.qtde_minima ?? 5)
+                              ? '#e74c3c'
+                              : '#4caf50',
                         }"
                       ></div>
                     </div>
@@ -103,56 +115,13 @@
       </aside>
     </main>
 
-    <div v-if="showModal" class="inventory-modal" @click.self="closeModal">
-      <div class="modal-content">
-        <h3>{{ editingItem ? "Editar Produto" : "Novo Produto" }}</h3>
-
-        <div class="form-group">
-          <label>Nome</label>
-          <input
-            v-model="form.nome"
-            type="text"
-            placeholder="Digite o nome do produto"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Categoria</label>
-          <input
-            v-model="form.categoria"
-            type="text"
-            placeholder="Ex: Bebidas, Lanches..."
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Preço (R$)</label>
-          <input
-            v-model.number="form.preco"
-            type="number"
-            min="0"
-            placeholder="0.00"
-          />
-        </div>
-
-        <div class="form-group">
-          <label>Quantidade em Estoque</label>
-          <input
-            v-model.number="form.estoque"
-            type="number"
-            min="0"
-            placeholder="0"
-          />
-        </div>
-
-        <div class="modal-actions">
-          <button class="cancel-btn" @click="closeModal">Cancelar</button>
-          <button class="save-btn" @click="saveItem">
-            {{ editingItem ? "Atualizar" : "Salvar" }}
-          </button>
-        </div>
-      </div>
-    </div>
+    <ProductModal
+      :show="showModal"
+      :editingItem="editingItem"
+      :form="form"
+      @close="closeModal"
+      @save="saveItem"
+    />
 
     <ConfirmModal
       :show="showConfirm"
@@ -161,12 +130,20 @@
       @close="showConfirm = false"
       @confirm="handleConfirmDelete"
     />
+
+    <StockWithdrawal
+      :show="showWithdrawal"
+      @close="showWithdrawal = false"
+      @update="refreshInventory"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import ProductModal from "./Components/ProductModal.vue";
+import StockWithdrawal from "./Components/StockWithdrawal.vue";
 import "./inventoryControl.css";
 import inventoryService from "../../service/inventoryService";
 
@@ -179,33 +156,45 @@ const form = ref({
   nome: "",
   categoria: "",
   preco: 0,
-  qtde_estoque: 0,
+  estoque: 0,
+  qtde_minima: 5,
 });
 
 const showConfirm = ref(false);
 const itemToDelete = ref(null);
+
 onMounted(async () => {
   try {
     const data = await inventoryService.getInventory();
     if (Array.isArray(data)) {
-      items.value = data.map(i => ({
+      items.value = data.map((i) => ({
         ...i,
         preco: i.preco_unit,
         estoque: i.qtde_estoque,
+        qtde_minima: i.qtde_minima ?? 5,
       }));
     }
   } catch (error) {
     console.error("Erro ao carregar produtos:", error);
   }
 });
+const showWithdrawal = ref(false);
 
+const openWithdrawal = () => {
+  showWithdrawal.value = true;
+};
 
+const refreshInventory = async () => {
+  const data = await inventoryService.getInventory();
+  items.value = data.map((i) => ({
+    ...i,
+    preco: i.preco_unit,
+    estoque: i.qtde_estoque,
+  }));
+};
 
 const showLowStockOnly = ref(false);
-
-const filterLowStock = () => {
-  showLowStockOnly.value = !showLowStockOnly.value;
-};
+const filterLowStock = () => (showLowStockOnly.value = !showLowStockOnly.value);
 
 const filteredItems = computed(() => {
   return items.value.filter((i) => {
@@ -214,7 +203,8 @@ const filteredItems = computed(() => {
       i.nome.toLowerCase().includes(searchQuery.value.toLowerCase());
     const matchCategory =
       !selectedCategory.value || i.categoria === selectedCategory.value;
-    const matchLowStock = !showLowStockOnly.value || i.estoque <= 5;
+    const matchLowStock =
+      !showLowStockOnly.value || i.estoque <= (i.qtde_minima ?? 5);
     return matchSearch && matchCategory && matchLowStock;
   });
 });
@@ -224,14 +214,11 @@ const categories = computed(() => [
 ]);
 
 const totalItems = computed(() => items.value.length);
-const totalValue = computed(() => {
-  return items.value.reduce(
-    (sum, i) => sum + (i.preco ?? 0) * (i.estoque ?? 0),
-    0
-  );
-});
+const totalValue = computed(() =>
+  items.value.reduce((sum, i) => sum + (i.preco ?? 0) * (i.estoque ?? 0), 0)
+);
 const lowStockCount = computed(
-  () => items.value.filter((i) => i.estoque <= 5).length
+  () => items.value.filter((i) => i.estoque <= (i.qtde_minima ?? 5)).length
 );
 
 const openModal = (item = null) => {
@@ -241,36 +228,41 @@ const openModal = (item = null) => {
     form.value = { ...item };
   } else {
     editingItem.value = null;
-    form.value = { nome: "", categoria: "", preco: 0, estoque: 0 };
+    form.value = {
+      nome: "",
+      categoria: "",
+      preco: 0,
+      estoque: 0,
+      qtde_minima: 5,
+    };
   }
 };
 
 const closeModal = () => {
   showModal.value = false;
-  form.value = { nome: "", categoria: "", preco: 0, estoque: 0 };
 };
 
-const saveItem = async () => {
-  if (!form.value.nome.trim()) return alert("Informe o nome do produto.");
-
+const saveItem = async (formData) => {
   const payload = {
-    nome: form.value.nome,
-    categoria: form.value.categoria,
-    preco_unit: form.value.preco_unit,
-    qtde_estoque: form.value.qtde_estoque,
+    nome: formData.nome,
+    categoria: formData.categoria,
+    preco_unit: formData.preco,
+    qtde_estoque: formData.estoque,
+    qtde_minima: formData.qtde_minima,
   };
 
   try {
     if (editingItem.value) {
       await inventoryService.updateItem(editingItem.value.id, payload);
       const index = items.value.findIndex((i) => i.id === editingItem.value.id);
-      items.value[index] = { ...items.value[index], ...form.value };
+      items.value[index] = { ...items.value[index], ...formData };
     } else {
       const newItem = await inventoryService.createItem(payload);
       items.value.push({
         ...newItem,
         preco: newItem.preco_unit,
         estoque: newItem.qtde_estoque,
+        qtde_minima: newItem.qtde_minima,
       });
     }
     closeModal();
@@ -278,7 +270,6 @@ const saveItem = async () => {
     console.error("Erro ao salvar item:", error);
   }
 };
-
 
 const requestDelete = (item) => {
   itemToDelete.value = item;
