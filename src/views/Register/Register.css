@@ -10,13 +10,15 @@
   align-items: center;
   backdrop-filter: blur(8px);
   z-index: 0;
+  padding: 20px;
 }
+
 
 .register-container {
   display: flex;
   width: 900px;
   height: 520px;
-  margin: 100px auto;
+  margin: 0;
   border-radius: 20px;
   overflow: hidden;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -58,7 +60,8 @@
 .register-form h2 {
   font-size: 24px;
   color: #2e7d32;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  margin-top: 15px;
   font-weight: 600;
 }
 
@@ -71,11 +74,12 @@
 .register-form input,
 .register-form select {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border-radius: 8px;
+  padding: 8px; 
+  margin-bottom: 10px; 
+  border-radius: 6px;
   border: 1px solid #ccc;
-  transition: all 0.3s ease;
+  font-size: 14px; 
+  box-sizing: border-box;
 }
 
 .register-form input:focus,

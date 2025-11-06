@@ -3,7 +3,7 @@
     <header class="inventory-header">
       <h2>Controle de Estoque</h2>
       <div class="header-actions">
-        <button class="add-btn" @click="openModal()">
+           <button class="add-btn" @click="openModal()">
           + Adicionar Item
         </button>
         <button class="stockWithdrawal" @click="openWithdrawal()">
@@ -119,6 +119,7 @@
       :show="showModal"
       :editingItem="editingItem"
       :form="form"
+      :loading="saving"
       @close="closeModal"
       @save="saveItem"
     />
@@ -148,6 +149,9 @@ import "./inventoryControl.css";
 import inventoryService from "../../service/inventoryService";
 
 const searchQuery = ref("");
+const loading = ref(false);
+const saving = ref(false);
+const deleting = ref(false);
 const selectedCategory = ref("");
 const showModal = ref(false);
 const editingItem = ref(null);
@@ -164,6 +168,7 @@ const showConfirm = ref(false);
 const itemToDelete = ref(null);
 
 onMounted(async () => {
+  loading.value = true;
   try {
     const data = await inventoryService.getInventory();
     if (Array.isArray(data)) {
@@ -176,6 +181,8 @@ onMounted(async () => {
     }
   } catch (error) {
     console.error("Erro ao carregar itens:", error);
+  } finally {
+    loading.value = false;
   }
 });
 const showWithdrawal = ref(false);
@@ -190,7 +197,7 @@ const refreshInventory = async () => {
     ...i,
     preco: i.preco_unit,
     estoque: i.qtde_estoque,
-    qtde_min: i.qtde_min ?? 5, 
+    qtde_min: i.qtde_min ?? 5,
   }));
 };
 
@@ -244,6 +251,7 @@ const closeModal = () => {
 };
 
 const saveItem = async (formData) => {
+  saving.value = true;
   const payload = {
     nome: formData.nome,
     categoria: formData.categoria,
@@ -266,11 +274,12 @@ const saveItem = async (formData) => {
         qtde_min: newItem.qtde_min,
       });
     }
-     await refreshInventory();
+    await refreshInventory();
     closeModal();
-
   } catch (error) {
     console.error("Erro ao salvar item:", error);
+  } finally {
+    saving.value = false;
   }
 };
 

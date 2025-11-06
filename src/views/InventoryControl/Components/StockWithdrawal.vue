@@ -13,6 +13,9 @@
           placeholder="Buscar produto..."
           class="filter-input"
         />
+        <button class="confirm-btn" @click="confirmWithdrawal">
+          Confirmar Retirada
+        </button>
       </div>
 
       <div class="modal-body">
@@ -58,13 +61,6 @@
           </tbody>
         </table>
       </div>
-
-      <footer class="modal-footer">
-        <button class="cancel-btn" @click="$emit('close')">Cancelar</button>
-        <button class="confirm-btn" @click="confirmWithdrawal">
-          Confirmar Retirada
-        </button>
-      </footer>
     </div>
   </div>
 </template>
@@ -72,7 +68,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import inventoryService from "@/service/inventoryService";
-
+import { useToast } from "vue-toastification"
+const toast = useToast()
 const props = defineProps({
   show: Boolean,
 });
@@ -117,22 +114,24 @@ const confirmWithdrawal = async () => {
     .map(([id, qty]) => ({
       id: parseInt(id),
       qtde: qty,
-    }));
+    }))
 
   if (toWithdraw.length === 0) {
-    alert("Nenhum item selecionado para retirada.");
-    return;
+    toast.warning("Nenhum item selecionado para retirada.")
+    return
   }
 
   try {
     await inventoryService.patchItem(toWithdraw);
-    alert("Retirada realizada com sucesso!");
+    toast.success("Retirada realizada com sucesso!")
+
     withdrawals.value = Object.fromEntries(items.value.map((i) => [i.id, 0]));
 
     emit("update");
     emit("close");
   } catch (error) {
-    console.error("Erro ao retirar itens:", error);
+  console.error("Erro ao retirar itens:", error);
+    toast.error("Erro ao retirar itens do estoque.")
   }
 };
 </script>
@@ -251,22 +250,53 @@ const confirmWithdrawal = async () => {
   margin: 0;
 }
 
-.input-number[type="number"] {
+/* .input-number[type="number"] {
   -moz-appearance: textfield;
+} */
+
+.filter-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
 .filter-input {
-  width: 100%;
-  margin-bottom: 12px;
-  padding: 8px;
+  flex: 1;
+  height: 40px;
+  padding: 0 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.2s ease;
+  box-sizing: border-box;
 }
 
 .filter-input:focus {
   border-color: #4caf50;
 }
+
+.confirm-btn {
+  height: 40px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 0 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  box-sizing: border-box;
+  margin-bottom: 12px;
+}
+
+.confirm-btn:hover {
+  background-color: #45a049;
+}
+
+
 </style>

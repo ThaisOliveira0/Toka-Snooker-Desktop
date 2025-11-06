@@ -19,11 +19,13 @@
   font-size: 24px;
   margin: 24px 24px;
 }
+
 .order-header h4 {
   font-weight: 600;
   font-size: 1.4rem;
   color: #fff; 
 }
+
 .order-content {
   display: flex;
   flex: 1;
@@ -277,32 +279,67 @@
     grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   }
 }
+
 .order-info {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: flex-start;
+  justify-content: space-between;
   gap: 20px;
-  padding: 20px;
-  justify-content: center;
-  background-color: #fff;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
-  margin: 0 20px 20px;
+  padding: 24px;
+  margin: 0 24px 20px;
+  background: #fff;
   border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  font-family: 'Poppins', sans-serif;
 }
 
 .order-field {
   display: flex;
   flex-direction: column;
-  flex: 1 1 200px;
-  min-width: 150px;
+  flex: 1;
+  gap: 6px;
 }
 
 .order-field label {
   font-weight: 600;
-  margin-bottom: 6px;
-  color: #333;
+  color: #305532;
+  font-size: 0.9rem;
 }
 
-.order-field input {
+.order-field input,
+.order-field textarea {
+  padding: 12px 14px;
+  border: 1.5px solid #ddd;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  background-color: #fafafa;
+  color: #333;
+  width: 100%;
+}
+
+.order-field input:focus,
+.order-field textarea:focus {
+  border-color: #2e7d32;
+  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.15);
+}
+
+.order-field textarea {
+  resize: none;
+  min-height: 48px;
+}
+
+.order-id-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.order-id-row input[type="number"] {
+  flex: 0 0 400px; 
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -310,7 +347,37 @@
   transition: border-color 0.2s;
 }
 
-.order-field input:focus {
+.order-id-row input[type="number"]:focus {
   border-color: #2e7d32;
   outline: none;
+}
+
+.checkbox-field {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.checkbox-field input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2e7d32;
+  cursor: pointer;
+}
+
+.checkbox-field label {
+  font-size: 0.9rem;
+  color: #333;
+  cursor: pointer;
+  user-select: none;
+}
+
+@media (max-width: 992px) {
+  .order-info {
+    flex-wrap: wrap;
+  }
+
+  .order-field {
+    flex: 1 1 100%;
+  }
 }

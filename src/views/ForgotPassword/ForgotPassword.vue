@@ -7,7 +7,7 @@
 
       <div class="auth-side right">
         <form class="auth-form" @submit.prevent="handlePasswordReset">
-          <button class="back-button" @click.prevent="goBack">
+               <button class="back-button" @click.prevent="goBack">
             ← Voltar
           </button>
 
@@ -22,11 +22,19 @@
 
           <input type="email" placeholder="E-mail" v-model="email" />
 
-          <button class="auth-button" type="submit">
-            Enviar código
+          <button class="auth-button" type="submit" :disabled="loading">
+            <span
+              v-if="loading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <span v-if="!loading">Enviar código</span>
           </button>
 
-          <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
+          <p v-if="successMessage" class="success-message">
+            {{ successMessage }}
+          </p>
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </form>
       </div>
@@ -38,10 +46,12 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { sendCode } from '@/service/authService.js'
+import { useToast } from "vue-toastification";
 
 const email = ref('')
 const successMessage = ref('')
 const errorMessage = ref('')
+const loading = ref(false);
 const router = useRouter()
 
 async function handlePasswordReset() {
@@ -53,11 +63,13 @@ async function handlePasswordReset() {
     return
   }
 
+  loading.value = true;
+
   try {
-    const response = await sendCode(email.value)
-    
+   const response = await sendCode(email.value)
+
     if (response) {
-      successMessage.value = response.message || 'Código enviado com sucesso!'
+     successMessage.value = response.message || 'Código enviado com sucesso!'
       sessionStorage.setItem('recoveryEmail', email.value)
       router.push('/inserir-codigo')
     } else {
@@ -66,6 +78,8 @@ async function handlePasswordReset() {
   } catch (error) {
     console.error(error)
     errorMessage.value = 'Erro no servidor. Tente novamente mais tarde.'
+  } finally {
+    loading.value = false;
   }
 }
 

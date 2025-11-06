@@ -1,0 +1,62 @@
+
+.Vue-Toastification__toast {
+  background-color: #fff !important;
+  color: #333 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px !important;
+  min-height: 52px;
+}
+
+.Vue-Toastification__progress-bar {
+  height: 4px !important;
+  border-radius: 0 0 10px 10px !important;
+}
+
+.Vue-Toastification__toast--success .Vue-Toastification__progress-bar { background-color: #28a745 !important; }
+.Vue-Toastification__toast--error .Vue-Toastification__progress-bar { background-color: #dc3545 !important; }
+.Vue-Toastification__toast--info .Vue-Toastification__progress-bar { background-color: #0d6efd !important; }
+.Vue-Toastification__toast--warning .Vue-Toastification__progress-bar { background-color: #ffc107 !important; }
+
+.Vue-Toastification__toast-body {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: 10px; 
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.Vue-Toastification__toast-body > svg:first-child {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  margin-right: 8px; 
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Vue-Toastification__toast--success svg path { fill: #28a745 !important; }
+.Vue-Toastification__toast--error svg path { fill: #dc3545 !important; }
+.Vue-Toastification__toast--info svg path { fill: #0d6efd !important; }
+.Vue-Toastification__toast--warning svg path { fill: #ffc107 !important; }
+
+.Vue-Toastification__close-button {
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666 !important;
+  font-size: 18px !important;
+  opacity: 0.7 !important;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+.Vue-Toastification__close-button:hover {
+  opacity: 1 !important;
+  transform: scale(1.1);
+}

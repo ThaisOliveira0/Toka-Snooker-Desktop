@@ -15,22 +15,24 @@
         />
       </div>
 
-      <div class="order-field">
+      <div class="order-field order-id-field">
         <label for="order-id">ID da Comanda</label>
-        <input
-          id="order-id"
-          type="number"
-          v-model="comandaId"
-          :disabled="novaComanda"
-          placeholder="Digite o ID da comanda"
-        />
-        <div class="checkbox-field">
-          <input type="checkbox" id="nova" v-model="novaComanda" />
-          <label for="nova">Criar nova comanda</label>
+        <div class="order-id-row">
+          <input
+            id="order-id"
+            type="number"
+            v-model="comandaId"
+            :disabled="novaComanda"
+            placeholder="Digite o ID"
+          />
+          <div class="checkbox-field">
+            <input type="checkbox" id="nova" v-model="novaComanda" />
+            <label for="nova">Criar nova comanda</label>
+          </div>
         </div>
       </div>
 
-      <div class="order-field">
+      <div class="order-field full-width">
         <label for="observacao">Observação</label>
         <textarea
           id="observacao"
@@ -43,8 +45,8 @@
     <main class="order-content">
       <section class="order-products">
         <div class="order-tabs">
-          <button 
-            v-for="tab in tabs" 
+          <button
+            v-for="tab in tabs"
             :key="tab"
             :class="{ active: tab === activeTab }"
             @click="activeTab = tab"
@@ -54,9 +56,9 @@
         </div>
 
         <div class="order-items">
-          <div 
-            v-for="item in filteredItems" 
-            :key="item.id" 
+          <div
+            v-for="item in filteredItems"
+            :key="item.id"
             class="order-item-card"
           >
             <div class="item-info">
@@ -104,8 +106,8 @@
           <strong>Total:</strong> R$ {{ cartTotal.toFixed(2) }}
         </div>
 
-        <button 
-          v-if="cart.length > 0" 
+        <button
+          v-if="cart.length > 0"
           class="confirm-btn"
           @click="confirmOrder"
         >
@@ -117,30 +119,34 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import orderService from '../../service/ordersService.js'
-import productService from '../../service/productService.js'
-import './orderLaunch.css'
+import { ref, computed, onMounted } from "vue";
+import { useToast } from "vue-toastification";
+import orderService from "../../service/ordersService.js";
+import productService from "../../service/productService.js";
+import "./orderLaunch.css";
 
-const tableNumber = ref('')
-const comandaId = ref('')
-const novaComanda = ref(false)
-const observacao = ref('')
-const items = ref([])
-const activeTab = ref('')
+const toast = useToast();
+
+const tableNumber = ref("");
+const comandaId = ref("");
+const novaComanda = ref(false);
+const observacao = ref("");
+const items = ref([]);
+const activeTab = ref("");
 
 const tabs = computed(() => {
-  const categorias = [...new Set(items.value.map(i => i.category))]
-  return categorias.length ? categorias : ['Carregando...']
-})
+  const categorias = [...new Set(items.value.map((i) => i.category))];
+  return categorias.length ? categorias : ["Carregando..."];
+});
 
 onMounted(async () => {
   try {
-    const response = await productService.getAllProdutos()
-    const produtos = response.data
+    const response = await productService.getAllProdutos();
+    const produtos = response.data;
 
-    items.value = produtos.map(p => {
-      const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco
+    items.value = produtos.map((p) => {
+      const temPromo =
+        p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco;
 
       return {
         id: p.id,
@@ -148,66 +154,68 @@ onMounted(async () => {
         name: p.nome,
         subtitle: p.descricao,
         price: temPromo ? p.preco_promo : p.preco,
-        quantity: 0
-      }
-    })
+        quantity: 0,
+      };
+    });
 
     if (items.value.length > 0) {
-      activeTab.value = items.value[0].category
+      activeTab.value = items.value[0].category;
     }
   } catch (error) {
-    console.error('Erro ao carregar produtos:', error)
-    alert('Não foi possível carregar os produtos.')
+    console.error("Erro ao carregar produtos:", error);
+    toast.error("Não foi possível carregar os produtos.");
   }
-})
+});
 
-const filteredItems = computed(() => 
-  items.value.filter(i => i.category === activeTab.value)
-)
+const filteredItems = computed(() =>
+  items.value.filter((i) => i.category === activeTab.value)
+);
 
-const addItem = (item) => item.quantity++
-const decreaseItem = (item) => { if (item.quantity > 0) item.quantity-- }
+const addItem = (item) => item.quantity++;
+const decreaseItem = (item) => {
+  if (item.quantity > 0) item.quantity--;
+};
 
-const cart = computed(() => items.value.filter(i => i.quantity > 0))
-const cartTotal = computed(() => 
+const cart = computed(() => items.value.filter((i) => i.quantity > 0));
+const cartTotal = computed(() =>
   cart.value.reduce((sum, i) => sum + i.price * i.quantity, 0)
-)
+);
 
 const confirmOrder = async () => {
   if (!tableNumber.value) {
-    return alert("Informe o número da mesa.")
+    return toast.warning("Informe o número da mesa.");
   }
 
   if (!novaComanda.value && !comandaId.value) {
-    return alert("Informe o ID da comanda ou marque 'Criar nova comanda'.")
+    return toast.warning(" Informe o ID da comanda.");
   }
 
   if (cart.value.length === 0) {
-    return alert("Adicione pelo menos um item ao pedido.")
+    return toast.info(" Adicione pelo menos um item ao pedido.");
   }
 
   const pedido = {
     id_comanda: novaComanda.value ? null : Number(comandaId.value),
     status: "PENDENTE",
     observacao: observacao.value || "",
-    produtos: cart.value.map(i => ({
+    produtos: cart.value.map((i) => ({
       id_produto: i.id,
       quantidade: i.quantity,
-      valor: i.price
-    }))
-  }
+      valor: i.price,
+    })),
+  };
 
   try {
-    await orderService.createPedido(pedido)
-    alert("Pedido criado com sucesso!")
+    await orderService.createPedido(pedido);
+    toast.success("✅ Pedido criado com sucesso!");
 
-    comandaId.value = ""
-    observacao.value = ""
-    novaComanda.value = false
-    items.value.forEach(i => (i.quantity = 0))
+    comandaId.value = "";
+    observacao.value = "";
+    novaComanda.value = false;
+    items.value.forEach((i) => (i.quantity = 0));
   } catch (error) {
-    console.error("Erro ao criar pedido:", error)
-    alert("Erro ao criar pedido.")
+    console.error("Erro ao criar pedido:", error);
+    toast.error(" Erro ao criar pedido.");
   }
-}
+};
 </script>
