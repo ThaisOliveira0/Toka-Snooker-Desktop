@@ -20,7 +20,7 @@ export default {
     }
   },
 
-  async createItem(item) {
+  async createItem(item) {   
     try {
       const response = await api.post("/ingredientes", item);
       return response.data;
@@ -37,6 +37,16 @@ export default {
       console.error("Erro ao atualizar ingrediente:", error);
     }
   },
+
+async patchItem(items) {
+  try {
+    const response = await api.patch(`/ingredientes`, items);
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao aplicar patch no ingrediente:", error);
+  }
+},
+
 
   async deleteItem(id) {
     try {

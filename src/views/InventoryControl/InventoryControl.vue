@@ -4,7 +4,7 @@
       <h2>Controle de Estoque</h2>
       <div class="header-actions">
         <button class="add-btn" @click="openModal()">
-          + Adicionar Produto
+          + Adicionar Item
         </button>
         <button class="stockWithdrawal" @click="openWithdrawal()">
           Retirar Itens
@@ -18,7 +18,7 @@
           <input
             type="text"
             v-model="searchQuery"
-            placeholder="Buscar produto..."
+            placeholder="Buscar item..."
           />
           <select v-model="selectedCategory">
             <option value="">Todas Categorias</option>
@@ -44,7 +44,7 @@
                 v-for="item in filteredItems"
                 :key="item.id"
                 :class="{
-                  'low-stock-row': item.estoque <= (item.qtde_minima ?? 5),
+                  'low-stock-row': item.estoque <= (item.qtde_min ?? 5),
                 }"
               >
                 <td>
@@ -64,7 +64,7 @@
                         :style="{
                           width: Math.min((item.estoque / 40) * 100, 100) + '%',
                           background:
-                            item.estoque <= (item.qtde_minima ?? 5)
+                            item.estoque <= (item.qtde_min ?? 5)
                               ? '#e74c3c'
                               : '#4caf50',
                         }"
@@ -157,7 +157,7 @@ const form = ref({
   categoria: "",
   preco: 0,
   estoque: 0,
-  qtde_minima: 5,
+  qtde_min: 5,
 });
 
 const showConfirm = ref(false);
@@ -171,11 +171,11 @@ onMounted(async () => {
         ...i,
         preco: i.preco_unit,
         estoque: i.qtde_estoque,
-        qtde_minima: i.qtde_minima ?? 5,
+        qtde_min: i.qtde_min ?? 5,
       }));
     }
   } catch (error) {
-    console.error("Erro ao carregar produtos:", error);
+    console.error("Erro ao carregar itens:", error);
   }
 });
 const showWithdrawal = ref(false);
@@ -190,6 +190,7 @@ const refreshInventory = async () => {
     ...i,
     preco: i.preco_unit,
     estoque: i.qtde_estoque,
+    qtde_min: i.qtde_min ?? 5, 
   }));
 };
 
@@ -204,7 +205,7 @@ const filteredItems = computed(() => {
     const matchCategory =
       !selectedCategory.value || i.categoria === selectedCategory.value;
     const matchLowStock =
-      !showLowStockOnly.value || i.estoque <= (i.qtde_minima ?? 5);
+      !showLowStockOnly.value || i.estoque <= (i.qtde_min ?? 5);
     return matchSearch && matchCategory && matchLowStock;
   });
 });
@@ -218,7 +219,7 @@ const totalValue = computed(() =>
   items.value.reduce((sum, i) => sum + (i.preco ?? 0) * (i.estoque ?? 0), 0)
 );
 const lowStockCount = computed(
-  () => items.value.filter((i) => i.estoque <= (i.qtde_minima ?? 5)).length
+  () => items.value.filter((i) => i.estoque <= (i.qtde_min ?? 5)).length
 );
 
 const openModal = (item = null) => {
@@ -233,7 +234,7 @@ const openModal = (item = null) => {
       categoria: "",
       preco: 0,
       estoque: 0,
-      qtde_minima: 5,
+      qtde_min: 5,
     };
   }
 };
@@ -248,7 +249,7 @@ const saveItem = async (formData) => {
     categoria: formData.categoria,
     preco_unit: formData.preco,
     qtde_estoque: formData.estoque,
-    qtde_minima: formData.qtde_minima,
+    qtde_min: formData.qtde_min,
   };
 
   try {
@@ -262,10 +263,12 @@ const saveItem = async (formData) => {
         ...newItem,
         preco: newItem.preco_unit,
         estoque: newItem.qtde_estoque,
-        qtde_minima: newItem.qtde_minima,
+        qtde_min: newItem.qtde_min,
       });
     }
+     await refreshInventory();
     closeModal();
+
   } catch (error) {
     console.error("Erro ao salvar item:", error);
   }

@@ -15,7 +15,6 @@ export default {
 async getAllComandas() {
     try {
       const response = await api.get("/comandas");
-      console.log(response);
       
       return response.data; 
     } catch (error) {
@@ -23,10 +22,9 @@ async getAllComandas() {
       return { sucesso: false, mensagem: "Erro ao buscar comandas.", dados: [] };
     }
   },
-  async createPedido(pedido) {
+  async createPedido(pedido) { 
   try {
     const response = await api.post("/pedidos", pedido);
-    console.log(response);
     
     return response.data;
   } catch (error) {

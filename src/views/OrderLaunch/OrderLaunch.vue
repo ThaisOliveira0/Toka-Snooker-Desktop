@@ -16,13 +16,27 @@
       </div>
 
       <div class="order-field">
-        <label for="customer-name">Nome</label>
+        <label for="order-id">ID da Comanda</label>
         <input
-          id="customer-name"
-          type="text"
-          v-model="customerName"
-          placeholder="Nome do cliente"
+          id="order-id"
+          type="number"
+          v-model="comandaId"
+          :disabled="novaComanda"
+          placeholder="Digite o ID da comanda"
         />
+        <div class="checkbox-field">
+          <input type="checkbox" id="nova" v-model="novaComanda" />
+          <label for="nova">Criar nova comanda</label>
+        </div>
+      </div>
+
+      <div class="order-field">
+        <label for="observacao">Observação</label>
+        <textarea
+          id="observacao"
+          v-model="observacao"
+          placeholder="Ex: sem molho, bem passado..."
+        ></textarea>
       </div>
     </section>
 
@@ -45,7 +59,6 @@
             :key="item.id" 
             class="order-item-card"
           >
-
             <div class="item-info">
               <h3>{{ item.name }}</h3>
               <p>{{ item.subtitle }}</p>
@@ -53,13 +66,7 @@
 
             <div class="item-actions">
               <div class="item-price">
-                <template v-if="item.promo">
-                  <!-- <span class="old-price">R$ {{ item.oldPrice.toFixed(2) }}</span> -->
-                  <span class="promo-price">R$ {{ item.price.toFixed(2) }}</span>
-                </template>
-                <template v-else>
-                  R$ {{ item.price.toFixed(2) }}
-                </template>
+                <span>R$ {{ item.price.toFixed(2) }}</span>
               </div>
 
               <div class="item-quantity">
@@ -110,16 +117,18 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import orderService from '../../service/ordersService.js'
-import './orderLaunch.css'
 import productService from '../../service/productService.js'
+import './orderLaunch.css'
 
 const tableNumber = ref('')
-const customerName = ref('')
-
+const comandaId = ref('')
+const novaComanda = ref(false)
+const observacao = ref('')
 const items = ref([])
 const activeTab = ref('')
+
 const tabs = computed(() => {
   const categorias = [...new Set(items.value.map(i => i.category))]
   return categorias.length ? categorias : ['Carregando...']
@@ -128,24 +137,20 @@ const tabs = computed(() => {
 onMounted(async () => {
   try {
     const response = await productService.getAllProdutos()
-
     const produtos = response.data
 
-items.value = produtos.map(p => {
-  const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco
+    items.value = produtos.map(p => {
+      const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco
 
-  return {
-    id: p.id,
-    category: p.categoria,
-    name: p.nome,
-    subtitle: p.descricao,
-    price: temPromo ? p.preco_promo : p.preco,
-    oldPrice: temPromo ? p.preco : null,
-    promo: temPromo,
-    quantity: 0
-  }
-})
-
+      return {
+        id: p.id,
+        category: p.categoria,
+        name: p.nome,
+        subtitle: p.descricao,
+        price: temPromo ? p.preco_promo : p.preco,
+        quantity: 0
+      }
+    })
 
     if (items.value.length > 0) {
       activeTab.value = items.value[0].category
@@ -161,49 +166,48 @@ const filteredItems = computed(() =>
 )
 
 const addItem = (item) => item.quantity++
-const decreaseItem = (item) => {
-  if (item.quantity > 0) item.quantity--
-}
+const decreaseItem = (item) => { if (item.quantity > 0) item.quantity-- }
 
-const cart = computed(() => 
-  items.value.filter(i => i.quantity > 0)
-)
-
+const cart = computed(() => items.value.filter(i => i.quantity > 0))
 const cartTotal = computed(() => 
   cart.value.reduce((sum, i) => sum + i.price * i.quantity, 0)
 )
 
 const confirmOrder = async () => {
-  if (!tableNumber.value || !customerName.value) {
-    return alert("Informe o número da mesa e o nome do cliente.");
+  if (!tableNumber.value) {
+    return alert("Informe o número da mesa.")
+  }
+
+  if (!novaComanda.value && !comandaId.value) {
+    return alert("Informe o ID da comanda ou marque 'Criar nova comanda'.")
   }
 
   if (cart.value.length === 0) {
-    return alert("Adicione pelo menos um item ao pedido.");
+    return alert("Adicione pelo menos um item ao pedido.")
   }
 
-  const novoPedido = {
-    mesa: tableNumber.value,
-    cliente: customerName.value,
-    itens: cart.value.map(i => ({
-      produto_id: i.id,
+  const pedido = {
+    id_comanda: novaComanda.value ? null : Number(comandaId.value),
+    status: "PENDENTE",
+    observacao: observacao.value || "",
+    produtos: cart.value.map(i => ({
+      id_produto: i.id,
       quantidade: i.quantity,
-      preco_unit: i.price
-    })),
-    total: cartTotal.value
-  };
+      valor: i.price
+    }))
+  }
 
   try {
-    const resultado = await orderService.createPedido(novoPedido);
-    alert(`Pedido da mesa ${tableNumber.value} criado com sucesso!`);
+    await orderService.createPedido(pedido)
+    alert("Pedido criado com sucesso!")
 
-    tableNumber.value = "";
-    customerName.value = "";
-    items.value.forEach(i => (i.quantity = 0));
+    comandaId.value = ""
+    observacao.value = ""
+    novaComanda.value = false
+    items.value.forEach(i => (i.quantity = 0))
   } catch (error) {
-    console.error("Erro ao criar pedido:", error);
-    alert("Não foi possível criar o pedido.");
+    console.error("Erro ao criar pedido:", error)
+    alert("Erro ao criar pedido.")
   }
-};
-
+}
 </script>

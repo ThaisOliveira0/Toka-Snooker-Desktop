@@ -44,7 +44,7 @@
       <div class="form-group">
         <label>Quantidade Mínima</label>
         <input
-          v-model.number="localForm.qtde_minima"
+          v-model.number="localForm.qtde_min"
           type="number"
           min="0"
           placeholder="Ex: 5"
@@ -58,6 +58,7 @@
         </button>
       </div>
     </div>
+    
   </div>
 </template>
 

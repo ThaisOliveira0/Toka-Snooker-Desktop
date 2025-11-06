@@ -6,6 +6,15 @@
         <button class="close-btn" @click="$emit('close')">×</button>
       </header>
 
+      <div class="filter-box">
+        <input
+          type="text"
+          v-model="searchQuery"
+          placeholder="Buscar produto..."
+          class="filter-input"
+        />
+      </div>
+
       <div class="modal-body">
         <table class="modern-table">
           <thead>
@@ -16,17 +25,34 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="item in items" :key="item.id">
+            <tr v-for="item in filteredItems" :key="item.id">
               <td>{{ item.nome }}</td>
               <td>{{ item.estoque }}</td>
               <td>
-                <input
-                  type="number"
-                  min="0"
-                  :max="item.estoque"
-                  v-model.number="withdrawals[item.id]"
-                  class="input-small"
-                />
+                <div class="input-wrapper">
+                  <button
+                    type="button"
+                    class="input-btn"
+                    @click="decrease(item.id)"
+                    :disabled="withdrawals[item.id] <= 0"
+                  >
+                    -
+                  </button>
+                  <input
+                    type="number"
+                    min="0"
+                    :max="item.estoque"
+                    v-model.number="withdrawals[item.id]"
+                    class="input-number"
+                  />
+                  <button
+                    type="button"
+                    class="input-btn"
+                    @click="increase(item.id, item.estoque)"
+                  >
+                    +
+                  </button>
+                </div>
               </td>
             </tr>
           </tbody>
@@ -35,14 +61,16 @@
 
       <footer class="modal-footer">
         <button class="cancel-btn" @click="$emit('close')">Cancelar</button>
-        <button class="confirm-btn" @click="confirmWithdrawal">Confirmar Retirada</button>
+        <button class="confirm-btn" @click="confirmWithdrawal">
+          Confirmar Retirada
+        </button>
       </footer>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import inventoryService from "@/service/inventoryService";
 
 const props = defineProps({
@@ -53,6 +81,8 @@ const emit = defineEmits(["close", "update"]);
 
 const items = ref([]);
 const withdrawals = ref({});
+const searchQuery = ref("");
+
 
 onMounted(async () => {
   try {
@@ -61,9 +91,24 @@ onMounted(async () => {
       ...i,
       estoque: i.qtde_estoque,
     }));
+
+    withdrawals.value = Object.fromEntries(items.value.map((i) => [i.id, 0]));
   } catch (error) {
     console.error("Erro ao carregar estoque:", error);
   }
+});
+
+const increase = (id, max) => {
+  if (withdrawals.value[id] < max) withdrawals.value[id]++;
+};
+
+const decrease = (id) => {
+  if (withdrawals.value[id] > 0) withdrawals.value[id]--;
+};
+
+const filteredItems = computed(() => {
+  const query = searchQuery.value.toLowerCase();
+  return items.value.filter((i) => i.nome.toLowerCase().includes(query));
 });
 
 const confirmWithdrawal = async () => {
@@ -71,7 +116,7 @@ const confirmWithdrawal = async () => {
     .filter(([_, qty]) => qty > 0)
     .map(([id, qty]) => ({
       id: parseInt(id),
-      qty,
+      qtde: qty,
     }));
 
   if (toWithdraw.length === 0) {
@@ -80,11 +125,11 @@ const confirmWithdrawal = async () => {
   }
 
   try {
-    for (const item of toWithdraw) {
-      await inventoryService.updateItem(item.id, { retirar: item.qty });
-    }
+    await inventoryService.patchItem(toWithdraw);
     alert("Retirada realizada com sucesso!");
-    emit("update"); 
+    withdrawals.value = Object.fromEntries(items.value.map((i) => [i.id, 0]));
+
+    emit("update");
     emit("close");
   } catch (error) {
     console.error("Erro ao retirar itens:", error);
@@ -118,11 +163,6 @@ const confirmWithdrawal = async () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
-}
-
-.input-small {
-  width: 80px;
-  text-align: center;
 }
 
 .confirm-btn {
@@ -162,4 +202,71 @@ const confirmWithdrawal = async () => {
   transform: scale(1);
 }
 
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.input-number {
+  width: 60px;
+  text-align: center;
+  padding: 6px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.input-number:focus {
+  border-color: #4caf50;
+}
+
+.input-btn {
+  background-color: #e0e0e0;
+  border: none;
+  border-radius: 6px;
+  width: 28px;
+  height: 28px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.input-btn:hover {
+  background-color: #d5d5d5;
+}
+
+.input-btn:disabled {
+  background-color: #f0f0f0;
+  cursor: not-allowed;
+}
+
+.input-number::-webkit-outer-spin-button,
+.input-number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-number[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.filter-input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.filter-input:focus {
+  border-color: #4caf50;
+}
 </style>
