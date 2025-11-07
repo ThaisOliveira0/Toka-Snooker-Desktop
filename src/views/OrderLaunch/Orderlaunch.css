@@ -334,18 +334,30 @@
 
 .order-id-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
+  flex-direction: column; 
+  align-items: flex-start;
+  gap: 0.4rem; 
 }
 
+.checkbox-field.below {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+
 .order-id-row input[type="number"] {
-  flex: 0 0 400px; 
+  width: 100%;
+  max-width: 400px; /* controla a largura sem esticar demais */
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
   font-size: 14px;
+  height: auto; /* garante altura natural */
   transition: border-color 0.2s;
+  box-sizing: border-box;
 }
+
 
 .order-id-row input[type="number"]:focus {
   border-color: #2e7d32;

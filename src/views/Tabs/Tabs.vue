@@ -1,12 +1,16 @@
 <template>
   <div class="page-root">
-    <header class="topbar">
-      <div class="logo">Toka</div>
-      <div class="search">
-        <input
-          v-model="search"
-          placeholder="Pesquisar Mesa"
-        />
+    <header class="tabs-header">
+      <h2>Comandas</h2>
+      <div class="search-actions">
+        <div class="search-bar">
+          <i class="fas fa-search"></i>
+          <input
+            type="text"
+            v-model="search"
+            placeholder="Buscar por mesa..."
+          />
+        </div>
       </div>
     </header>
 

@@ -7,6 +7,18 @@
   box-sizing: border-box;
 }
 
+.tabs-header {
+  background-color: #305532;
+  color: #fff;
+  padding: 16px 24px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+  margin-bottom: 20px;
+}
+
 .topbar {
   display: flex;
   align-items: center;
@@ -56,6 +68,7 @@
 .cards-container::-webkit-scrollbar {
   height: 8px;
 }
+
 .cards-container::-webkit-scrollbar-thumb {
   background: rgba(0, 0, 0, 0.12);
   border-radius: 4px;
@@ -74,6 +87,7 @@
   color: #333;
   transition: color 0.2s;
 }
+
 .arrow:hover {
   color: #000;
 }
@@ -87,4 +101,44 @@
   .arrow {
     display: none;
   }
+}
+
+.search-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  background: #f1f3f2;
+  border-radius: 25px;
+  padding: 6px 12px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.search-bar i {
+  color: #4caf50;
+  font-size: 16px;
+  margin-right: 8px;
+}
+
+.search-bar input {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 14px;
+  color: #333;
+  width: 160px;
+  transition: width 0.3s ease;
+}
+
+.search-bar input:focus {
+  width: 220px;
+}
+
+.search-bar:hover {
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
 }

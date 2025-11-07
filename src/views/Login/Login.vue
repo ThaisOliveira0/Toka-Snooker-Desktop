@@ -8,7 +8,7 @@
       <div class="auth-side right">
         <form class="auth-form">
           <button class="back-button" @click.prevent="goBack">
-            ← Voltar
+             <i class="fas fa-arrow-left"></i> 
           </button>
           <h2>Login</h2>
           <div class="avatar">

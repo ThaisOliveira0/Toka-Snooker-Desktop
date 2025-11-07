@@ -23,15 +23,20 @@
         <input v-model.number="localForm.preco" type="number" min="0" placeholder="0.00" />
       </div>
 
-      <div class="product-form-group">
-        <label>Preço Promocional</label>
-        <input v-model.number="localForm.preco_promo" type="number" min="0" placeholder="0.00" />
-      </div>
+<div class="product-form-row">
+  <div class="product-form-group">
+    <label>Preço Promocional</label>
+    <input v-model.number="localForm.preco_promo" type="number" min="0" placeholder="0.00" />
+  </div>
 
-      <div class="product-form-group">
-        <label>Promo?</label>
-        <input type="checkbox" v-model="localForm.promo" />
-      </div>
+  <div class="promo-inline-vertical">
+    <label for="promo">Promo?</label>
+    <input id="promo" type="checkbox" v-model="localForm.promo" />
+  </div>
+</div>
+
+
+
 
       <div class="product-form-group">
         <label>Foto</label>
@@ -175,4 +180,67 @@ const save = async () => {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+
+.product-modal-content h3 {
+  color: #305532; 
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+
+.promo-group {
+  display: flex;
+  align-items: center; 
+  gap: 8px; 
+}
+
+.promo-group label {
+  margin: 0; 
+  font-weight: 500;
+  color: #333;
+}
+
+.promo-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2e7d32;
+  cursor: pointer;
+}
+
+.product-form-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.product-form-row .product-form-group {
+  flex: 1;
+}
+
+.promo-inline-vertical {
+  display: flex;
+  flex-direction: column;
+  align-items: center; 
+  gap: 4px;
+  margin-bottom: 4px;
+  white-space: nowrap;
+}
+
+.promo-inline-vertical label {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.9rem;
+}
+
+.promo-inline-vertical input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2e7d32; 
+  cursor: pointer;
+}
+
+
 </style>

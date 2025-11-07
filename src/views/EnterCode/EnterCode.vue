@@ -7,7 +7,7 @@
 
       <div class="auth-side right">
         <form class="auth-form" @submit.prevent="verifyCode">
-          <button class="back-button" @click.prevent="goBack">Voltar</button>
+          <button class="back-button" @click.prevent="goBack"> <i class="fas fa-arrow-left"></i></button>
 
           <h2>Verificar código</h2>
           <div class="avatar">

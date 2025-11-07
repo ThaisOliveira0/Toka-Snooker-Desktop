@@ -7,8 +7,8 @@
 
       <div class="auth-side right">
         <form class="auth-form" @submit.prevent="handlePasswordReset">
-               <button class="back-button" @click.prevent="goBack">
-            ← Voltar
+          <button class="back-button" @click.prevent="goBack">
+            <i class="fas fa-arrow-left"></i>
           </button>
 
           <h2>Recuperar senha</h2>
@@ -17,7 +17,8 @@
           </div>
 
           <p class="info-text">
-            Digite o e-mail cadastrado para receber o código de redefinição de senha.
+            Digite o e-mail cadastrado para receber o código de redefinição de
+            senha.
           </p>
 
           <input type="email" placeholder="E-mail" v-model="email" />
@@ -43,48 +44,48 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
-import { sendCode } from '@/service/authService.js'
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { sendCode } from "@/service/authService.js";
 import { useToast } from "vue-toastification";
 
-const email = ref('')
-const successMessage = ref('')
-const errorMessage = ref('')
+const email = ref("");
+const successMessage = ref("");
+const errorMessage = ref("");
 const loading = ref(false);
-const router = useRouter()
+const router = useRouter();
 
 async function handlePasswordReset() {
-  errorMessage.value = ''
-  successMessage.value = ''
+  errorMessage.value = "";
+  successMessage.value = "";
 
   if (!email.value) {
-    errorMessage.value = 'Por favor, insira seu e-mail.'
-    return
+    errorMessage.value = "Por favor, insira seu e-mail.";
+    return;
   }
 
   loading.value = true;
 
   try {
-   const response = await sendCode(email.value)
+    const response = await sendCode(email.value);
 
     if (response) {
-     successMessage.value = response.message || 'Código enviado com sucesso!'
-      sessionStorage.setItem('recoveryEmail', email.value)
-      router.push('/inserir-codigo')
+      successMessage.value = response.message || "Código enviado com sucesso!";
+      sessionStorage.setItem("recoveryEmail", email.value);
+      router.push("/inserir-codigo");
     } else {
-      errorMessage.value = response.message || 'Erro ao enviar o código.'
+      errorMessage.value = response.message || "Erro ao enviar o código.";
     }
   } catch (error) {
-    console.error(error)
-    errorMessage.value = 'Erro no servidor. Tente novamente mais tarde.'
+    console.error(error);
+    errorMessage.value = "Erro no servidor. Tente novamente mais tarde.";
   } finally {
     loading.value = false;
   }
 }
 
 function goBack() {
-  router.push('/')
+  router.push("/");
 }
 </script>
 

@@ -7,7 +7,7 @@
 
     <section class="order-info">
       <div class="order-field">
-        <label for="table-number">Mesa</label>
+        <label for="table-number">Mesa:</label>
         <input
           id="table-number"
           type="number"
@@ -17,28 +17,39 @@
       </div>
 
       <div class="order-field order-id-field">
-        <label for="order-id">ID da Comanda</label>
+        <label for="order-id">ID da Comanda:</label>
         <div class="order-id-row">
-          <input
-            id="order-id"
-            type="number"
-            v-model="comandaId"
-            :disabled="novaComanda"
-            placeholder="Digite o ID"
-          />
-          <div class="checkbox-field">
-            <input type="checkbox" id="nova" v-model="novaComanda" />
-            <label for="nova">Criar nova comanda</label>
-          </div>
-        </div>
+        <input
+          id="order-id"
+          type="number"
+          v-model="comandaId"
+          :disabled="novaComanda"
+          placeholder="Digite o ID"
+        />
+
+      <div class="checkbox-field below">
+        <input type="checkbox" id="nova" v-model="novaComanda" />
+        <label for="nova">Criar nova comanda</label>
+      </div>
+    </div>
+
       </div>
 
       <div class="order-field full-width">
-        <label for="observacao">Observação</label>
+        <label for="observacao">Observação:</label>
         <textarea
           id="observacao"
           v-model="observacao"
           placeholder="Ex: sem molho, bem passado..."
+        ></textarea>
+      </div>
+
+      <div class="order-field full-width">
+        <label for="name">Nome do cliente:</label>
+        <textarea
+          id="name"
+          v-model="name"
+          placeholder="Insira um nome "
         ></textarea>
       </div>
     </section>
