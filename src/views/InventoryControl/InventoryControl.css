@@ -206,34 +206,43 @@
 .low-stock-row:hover {
   background: #ffecec;
 }
-.actions {
-  display: flex;      
-  align-items: center; 
-   flex-wrap: nowrap;
+td.actions {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px;
+  white-space: nowrap !important;
 }
 
-.actions button {
-  display: flex;      
+td.actions button {
+  display: flex;
   align-items: center;
   justify-content: center;
   border: none;
   background: transparent;
   cursor: pointer;
-    width: auto;
+  width: 32px;
+  height: 32px;
 }
 
-.actions button i {
-  display: inline-block;   
-  font-size: 1.0rem;   
+td.actions button i {
+  font-size: 1.2rem;
   transition: transform 0.2s ease;
 }
 
-.edit-btn i { color: #2a793d; }
-.remove-btn i { color: #e74c3c; }
+td.actions .edit-btn i {
+  color: #2a793d;
+}
 
-.actions button:hover i {
+td.actions .remove-btn i {
+  color: #e74c3c;
+}
+
+td.actions button:hover i {
   transform: scale(1.2);
 }
+
 
 .modern-table th:last-child,
 .modern-table td.actions {

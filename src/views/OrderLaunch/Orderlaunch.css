@@ -381,3 +381,25 @@
     flex: 1 1 100%;
   }
 }
+
+.new-product-btn{
+    display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #3d6d3f;
+  color: #fff;
+  border: none;
+  padding: 12px 12px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+.new-product-btn:hover {
+  background-color: #43a047;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}

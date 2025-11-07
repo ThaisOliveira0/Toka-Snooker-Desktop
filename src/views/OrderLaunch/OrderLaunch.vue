@@ -2,6 +2,7 @@
   <div class="order-launch">
     <header class="order-header">
       <h4>Lançamento de Pedido</h4>
+      <button class="new-product-btn" @click="openNewProductModal">+ Novo Produto</button>
     </header>
 
     <section class="order-info">
@@ -63,7 +64,6 @@
           >
             <div class="item-info">
               <h3>{{ item.name }}</h3>
-              <p>{{ item.subtitle }}</p>
             </div>
 
             <div class="item-actions">
@@ -116,6 +116,13 @@
       </aside>
     </main>
   </div>
+    <NewProduct
+    :show="showNewProductModal"
+    :form="newProductForm"
+    :editingItem="null"
+    @close="closeNewProductModal"
+    @save="saveNewProduct"
+    />
 </template>
 
 <script setup>
@@ -123,6 +130,7 @@ import { ref, computed, onMounted } from "vue";
 import { useToast } from "vue-toastification";
 import orderService from "../../service/ordersService.js";
 import productService from "../../service/productService.js";
+import NewProduct from "./Components/NewProduct.vue";
 import "./orderLaunch.css";
 
 const toast = useToast();
@@ -133,6 +141,61 @@ const novaComanda = ref(false);
 const observacao = ref("");
 const items = ref([]);
 const activeTab = ref("");
+
+const showNewProductModal = ref(false); 
+const newProductForm = ref({
+  nome: "",
+  categoria: "",
+  preco: 0,
+  estoque: 0,
+  qtde_min: 0,
+});
+
+const openNewProductModal = () => {
+  newProductForm.value = { nome: "", categoria: "", preco: 0, estoque: 0, qtde_min: 0 };
+  showNewProductModal.value = true;
+};
+
+const closeNewProductModal = () => {
+  showNewProductModal.value = false;
+};
+
+const saveNewProduct = async (product) => {
+  try {
+    const payload = {
+      nome: product.nome,
+      descricao: product.descricao || "",
+      promo: product.preco_promo && product.preco_promo > 0 ? true : false,
+      preco: Number(product.preco) || 0,
+      preco_promo: product.preco_promo ? Number(product.preco_promo) : null,
+      categoria: product.categoria || "Outros",
+      foto: product.foto || "default.jpg"
+    };
+
+    await productService.createProduto(payload); 
+    toast.success("Produto criado com sucesso!");
+    showNewProductModal.value = false;
+
+   const produtos = await productService.getAllProdutos(); 
+items.value = produtos.map((p) => {
+  const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco;
+  return {
+    id: p.id,
+    category: p.categoria,
+    name: p.nome,
+    subtitle: p.descricao,
+    price: temPromo ? p.preco_promo : p.preco,
+    quantity: 0,
+  };
+});
+
+
+    if (items.value.length > 0) activeTab.value = items.value[0].category;
+  } catch (error) {
+    console.error("Erro ao criar produto:", error);
+    toast.error("Não foi possível criar o produto.");
+  }
+};
 
 const tabs = computed(() => {
   const categorias = [...new Set(items.value.map((i) => i.category))];
@@ -158,9 +221,7 @@ onMounted(async () => {
       };
     });
 
-    if (items.value.length > 0) {
-      activeTab.value = items.value[0].category;
-    }
+    if (items.value.length > 0) activeTab.value = items.value[0].category;
   } catch (error) {
     console.error("Erro ao carregar produtos:", error);
     toast.error("Não foi possível carregar os produtos.");
@@ -182,17 +243,9 @@ const cartTotal = computed(() =>
 );
 
 const confirmOrder = async () => {
-  if (!tableNumber.value) {
-    return toast.warning("Informe o número da mesa.");
-  }
-
-  if (!novaComanda.value && !comandaId.value) {
-    return toast.warning(" Informe o ID da comanda.");
-  }
-
-  if (cart.value.length === 0) {
-    return toast.info(" Adicione pelo menos um item ao pedido.");
-  }
+  if (!tableNumber.value) return toast.warning("Informe o número da mesa.");
+  if (!novaComanda.value && !comandaId.value) return toast.warning("Informe o ID da comanda.");
+  if (cart.value.length === 0) return toast.info("Adicione pelo menos um item ao pedido.");
 
   const pedido = {
     id_comanda: novaComanda.value ? null : Number(comandaId.value),
@@ -201,21 +254,27 @@ const confirmOrder = async () => {
     produtos: cart.value.map((i) => ({
       id_produto: i.id,
       quantidade: i.quantity,
-      valor: i.price,
+      valor_unit: i.price,
     })),
   };
 
   try {
-    await orderService.createPedido(pedido);
-    toast.success("✅ Pedido criado com sucesso!");
+    const response = await orderService.createPedido(pedido);
 
-    comandaId.value = "";
-    observacao.value = "";
-    novaComanda.value = false;
-    items.value.forEach((i) => (i.quantity = 0));
+if (response.data.sucesso === true) {
+  toast.success(response.data.mensagem || "Pedido criado com sucesso!");
+  comandaId.value = "";
+  observacao.value = "";
+  novaComanda.value = false;
+  items.value.forEach((i) => (i.quantity = 0));
+} else {
+  console.error("Erro na resposta da API:", response.data);
+  toast.error("Erro ao criar pedido.");
+}
+
   } catch (error) {
     console.error("Erro ao criar pedido:", error);
-    toast.error(" Erro ao criar pedido.");
+    toast.error("Erro ao criar pedido.");
   }
 };
 </script>

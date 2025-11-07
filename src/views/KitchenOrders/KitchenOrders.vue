@@ -1,7 +1,7 @@
 <template>
   <div class="kitchen-container">
     <header class="kitchen-header">
-      <h4>Lançamento de Pedido</h4>
+      <h4>Pedidos - Cozinha</h4>
       <div class="filters">
         <button
           v-for="status in ['All', 'New', 'InProgress', 'Completed']"

@@ -1,5 +1,5 @@
 <template>
-  <div v-if="show" class="modal-overlay">
+  <div v-show="show" class="modal-overlay">
     <div class="modal">
       <header class="modal-header">
         <h3>Retirada de Itens do Estoque</h3>
@@ -7,12 +7,7 @@
       </header>
 
       <div class="filter-box">
-        <input
-          type="text"
-          v-model="searchQuery"
-          placeholder="Buscar produto..."
-          class="filter-input"
-        />
+        <input type="text" v-model="searchQuery" placeholder="Buscar produto..." class="filter-input" />
         <button class="confirm-btn" @click="confirmWithdrawal">
           Confirmar Retirada
         </button>
@@ -33,26 +28,13 @@
               <td>{{ item.estoque }}</td>
               <td>
                 <div class="input-wrapper">
-                  <button
-                    type="button"
-                    class="input-btn"
-                    @click="decrease(item.id)"
-                    :disabled="withdrawals[item.id] <= 0"
-                  >
+                  <button type="button" class="input-btn" @click="decrease(item.id)"
+                    :disabled="withdrawals[item.id] <= 0">
                     -
                   </button>
-                  <input
-                    type="number"
-                    min="0"
-                    :max="item.estoque"
-                    v-model.number="withdrawals[item.id]"
-                    class="input-number"
-                  />
-                  <button
-                    type="button"
-                    class="input-btn"
-                    @click="increase(item.id, item.estoque)"
-                  >
+                  <input type="number" min="0" :max="item.estoque" v-model.number="withdrawals[item.id]"
+                    class="input-number" />
+                  <button type="button" class="input-btn" @click="increase(item.id, item.estoque)">
                     +
                   </button>
                 </div>
@@ -66,13 +48,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, computed, watch } from "vue";
 import inventoryService from "@/service/inventoryService";
 import { useToast } from "vue-toastification"
 const toast = useToast()
 const props = defineProps({
   show: Boolean,
 });
+
 
 const emit = defineEmits(["close", "update"]);
 
@@ -94,6 +77,23 @@ onMounted(async () => {
     console.error("Erro ao carregar estoque:", error);
   }
 });
+watch(() => props.show, async (val) => {
+  if (val) {
+    try {
+      const data = await inventoryService.getInventory();
+      items.value = data.map((i) => ({
+        ...i,
+        estoque: i.qtde_estoque,
+      }));
+
+      withdrawals.value = Object.fromEntries(items.value.map((i) => [i.id, 0]));
+    } catch (error) {
+      console.error("Erro ao recarregar estoque:", error);
+      toast.error("Erro ao atualizar o estoque.");
+    }
+  }
+});
+
 
 const increase = (id, max) => {
   if (withdrawals.value[id] < max) withdrawals.value[id]++;
@@ -111,50 +111,62 @@ const filteredItems = computed(() => {
 const confirmWithdrawal = async () => {
   const toWithdraw = Object.entries(withdrawals.value)
     .filter(([_, qty]) => qty > 0)
-    .map(([id, qty]) => ({
-      id: parseInt(id),
-      qtde: qty,
-    }))
+    .map(([id, qty]) => {
+      const item = items.value.find(i => i.id === parseInt(id));
+      const novoEstoque = item.estoque - qty;
+
+      return {
+        id: parseInt(id),
+        qtde: novoEstoque,
+      };
+    });
 
   if (toWithdraw.length === 0) {
-    toast.warning("Nenhum item selecionado para retirada.")
-    return
+    toast.warning("Nenhum item selecionado para retirada.");
+    return;
   }
 
   try {
     await inventoryService.patchItem(toWithdraw);
-    toast.success("Retirada realizada com sucesso!")
+    toast.success("Retirada realizada com sucesso!");
 
     withdrawals.value = Object.fromEntries(items.value.map((i) => [i.id, 0]));
 
     emit("update");
     emit("close");
   } catch (error) {
-  console.error("Erro ao retirar itens:", error);
-    toast.error("Erro ao retirar itens do estoque.")
+    console.error("Erro ao retirar itens:", error);
+    toast.error("Erro ao retirar itens do estoque.");
   }
 };
+
 </script>
 
 <style scoped>
 .modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
+  position: fixed !important;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 20;
+  z-index: 999999 !important;
 }
 
 .modal {
-  background: #fff;
+  background: white;
   border-radius: 16px;
-  width: 600px;
+  padding: 20px;
+  max-width: 600px;
+  width: 100%;
   max-height: 80vh;
   overflow-y: auto;
-  padding: 20px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  position: relative;
+  display: block;
 }
 
 .modal-header {
@@ -297,6 +309,4 @@ const confirmWithdrawal = async () => {
 .confirm-btn:hover {
   background-color: #45a049;
 }
-
-
 </style>

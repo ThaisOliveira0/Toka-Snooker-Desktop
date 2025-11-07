@@ -23,10 +23,10 @@ async getAllComandas() {
     }
   },
   async createPedido(pedido) { 
-  try {
-    const response = await api.post("/pedidos", pedido);
+    try {
+      const response = await api.post("/pedidos", pedido);
     
-    return response.data;
+    return response;
   } catch (error) {
     console.error("Erro ao criar pedido:", error);
     return { sucesso: false, mensagem: "Erro ao criar pedido." };
