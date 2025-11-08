@@ -23,20 +23,17 @@
         <input v-model.number="localForm.preco" type="number" min="0" placeholder="0.00" />
       </div>
 
-<div class="product-form-row">
-  <div class="product-form-group">
-    <label>Preço Promocional</label>
-    <input v-model.number="localForm.preco_promo" type="number" min="0" placeholder="0.00" />
-  </div>
+      <div class="product-form-row">
+        <div class="product-form-group">
+          <label>Preço Promocional</label>
+          <input v-model.number="localForm.preco_promo" type="number" min="0" placeholder="0.00" />
+        </div>
 
-  <div class="promo-inline-vertical">
-    <label for="promo">Promo?</label>
-    <input id="promo" type="checkbox" v-model="localForm.promo" />
-  </div>
-</div>
-
-
-
+        <div class="promo-inline-vertical">
+          <label for="promo">Promo?</label>
+          <input id="promo" type="checkbox" v-model="localForm.promo" />
+        </div>
+      </div>
 
       <div class="product-form-group">
         <label>Foto</label>
@@ -44,6 +41,15 @@
       </div>
 
       <div class="product-modal-actions">
+      <button
+          v-if="editingItem && editingItem.id"
+          class="product-delete-btn"
+          @click="confirmDelete"
+          :disabled="loading"
+        >
+          Excluir
+        </button>
+
         <button class="product-cancel-btn" @click="close">Cancelar</button>
         <button class="product-save-btn" @click="save" :disabled="loading">
           <span v-if="loading" class="product-spinner"></span>
@@ -63,7 +69,7 @@ const props = defineProps({
   form: Object,
 });
 
-const emit = defineEmits(["close", "save"]);
+const emit = defineEmits(["close", "save", "delete"]);
 const loading = ref(false);
 const localForm = ref({ ...props.form });
 
@@ -85,14 +91,24 @@ const save = async () => {
     loading.value = false;
   }
 };
-</script>
 
+const confirmDelete = async () => {
+  if (confirm("Tem certeza que deseja excluir este produto?")) {
+    loading.value = true;
+    try {
+      await emit("delete", props.editingItem.id);
+    } finally {
+      loading.value = false;
+    }
+  }
+};
+</script>
 
 <style scoped>
 .product-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -148,7 +164,6 @@ const save = async () => {
   border-radius: 6px;
   cursor: pointer;
 }
-
 .product-save-btn:hover {
   background-color: #43a047;
 }
@@ -161,9 +176,21 @@ const save = async () => {
   border-radius: 6px;
   cursor: pointer;
 }
-
 .product-cancel-btn:hover {
   background-color: #bdbdbd;
+}
+
+.product-delete-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: auto;
+}
+.product-delete-btn:hover {
+  background-color: #c62828;
 }
 
 .product-spinner {
@@ -182,31 +209,11 @@ const save = async () => {
 }
 
 .product-modal-content h3 {
-  color: #305532; 
+  color: #305532;
   font-family: 'Poppins', sans-serif;
   font-weight: 600;
   text-align: center;
   margin-bottom: 16px;
-}
-
-
-.promo-group {
-  display: flex;
-  align-items: center; 
-  gap: 8px; 
-}
-
-.promo-group label {
-  margin: 0; 
-  font-weight: 500;
-  color: #333;
-}
-
-.promo-group input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  accent-color: #2e7d32;
-  cursor: pointer;
 }
 
 .product-form-row {
@@ -215,7 +222,6 @@ const save = async () => {
   justify-content: space-between;
   gap: 16px;
 }
-
 .product-form-row .product-form-group {
   flex: 1;
 }
@@ -223,24 +229,20 @@ const save = async () => {
 .promo-inline-vertical {
   display: flex;
   flex-direction: column;
-  align-items: center; 
+  align-items: center;
   gap: 4px;
   margin-bottom: 4px;
   white-space: nowrap;
 }
-
 .promo-inline-vertical label {
   font-weight: 500;
   color: #333;
   font-size: 0.9rem;
 }
-
 .promo-inline-vertical input[type="checkbox"] {
   width: 18px;
   height: 18px;
-  accent-color: #2e7d32; 
+  accent-color: #2e7d32;
   cursor: pointer;
 }
-
-
 </style>

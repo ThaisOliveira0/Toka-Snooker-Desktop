@@ -13,13 +13,14 @@ const api = axios.create({
 export default {
     async getAllProdutos() {
         try {
-            const response = await api.get("/produtos/")
-            return response.data
+            const response = await api.get("/produtos/");
+            return response.data; 
         } catch (error) {
-            console.error('Erro ao buscar produtos:', error)
-            return { data: [] }
+            console.error("Erro ao buscar produtos:", error);
+            return []; 
         }
     },
+
     createProduto(produtoData) {
         return api.post("/produtos/", produtoData);
     },

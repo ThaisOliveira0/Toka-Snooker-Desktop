@@ -15,7 +15,7 @@ export default {
 async getAllComandas() {
     try {
       const response = await api.get("/comandas");
-      
+
       return response.data; 
     } catch (error) {
       console.error("Erro ao buscar comandas:", error);
@@ -32,4 +32,25 @@ async getAllComandas() {
     return { sucesso: false, mensagem: "Erro ao criar pedido." };
   }
 },
+  async getAllPedidos() { 
+    try {
+      const response = await api.get("/pedidos");
+    
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao carregar pedido:", error);
+    return { sucesso: false, mensagem: "Erro ao carregar pedido." };
+  }
+},
+async updateStatus(id, status) {
+  console.log(id, status);
+  
+    try {
+      const response = await api.put(`/pedidos/${id}`, { status });
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao atualizar status do pedido:", error);
+      return { sucesso: false, mensagem: "Erro ao atualizar status do pedido." };
+    }
+  },
 };

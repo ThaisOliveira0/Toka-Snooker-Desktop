@@ -51,11 +51,15 @@ onMounted(async () => {
 const orders = computed(() =>
   comandas.value.map(comanda => ({
     mesa: `Mesa ${comanda.mesa?.toString().padStart(2, "0")}`,
-    pedido: (comanda.items_pedido || []).map(p => ({
-      nome: p.nome,
-      quantidade: p.quantidade,
-      valor_total: p.valor_total
-    })),
+    pedido: (comanda.pedido || []).flatMap(p =>
+      (p.itens || []).map(item => ({
+        nome: item.nome,
+        quantidade: item.quantidade,
+        valor_total: item.valor_unit, 
+        status: p.status,
+        observacao: p.observacao
+      }))
+    ),
     musica_pedido: (comanda.musica_pedido || []).map(m => ({
       nome: m.nome,
       quantidade: m.quantidade,

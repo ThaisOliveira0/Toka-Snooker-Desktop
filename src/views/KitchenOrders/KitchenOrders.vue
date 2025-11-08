@@ -4,7 +4,7 @@
       <h4>Pedidos - Cozinha</h4>
       <div class="filters">
         <button
-          v-for="status in ['All', 'New', 'InProgress', 'Completed']"
+          v-for="status in ['All', 'PENDENTE', 'EM_PREPARO', 'PRONTO']"
           :key="status"
           :class="{ active: filterStatus === status }"
           @click="filterStatus = status"
@@ -19,45 +19,40 @@
         v-for="order in filteredOrders"
         :key="order.id"
         class="order-card"
-        :class="order.status"
+        :class="statusClass(order.status)"
       >
         <div class="order-meta">
-          <span class="order-time">{{ order.time }}</span>
-          <span class="waiting-time">{{ order.waitingMinutes }} min</span>
-        </div>
-
-        <div class="order-header">
           <span class="order-number">Pedido #{{ order.id }}</span>
+          <span class="order-value">Total: R$ {{ order.valor_total }}</span>
         </div>
 
         <ul class="order-items">
-          <li v-for="item in order.items" :key="item.name">
-            {{ item.quantity }}x {{ item.name }}
+          <li v-for="item in order.itens" :key="item.id">
+            {{ item.quantidade }}x {{ item.nome }}
           </li>
         </ul>
 
-        <p v-if="order.observation" class="order-observation">
-          <strong>Observação:</strong> {{ order.observation }}
+        <p v-if="order.observacao" class="order-observation">
+          <strong>Observação:</strong> {{ order.observacao }}
         </p>
 
         <button
-  v-if="order.status !== 'completed'"
-  @click="advanceStatus(order.id)"
-  class="complete-btn"
-  :class="{
-    'btn-in-progress': order.status === 'inProgress',
-    'btn-new': order.status === 'new'
-  }"
->
-  {{
-    order.status === "new"
-      ? "Iniciar preparo"
-      : order.status === "inProgress"
-      ? "Marcar como pronto"
-      : ""
-  }}
-</button>
-
+          v-if="order.status !== 'PRONTO'"
+          @click="advanceStatus(order.id)"
+          class="complete-btn"
+          :class="{
+            'btn-in-progress': order.status === 'EM_PREPARO',
+            'btn-new': order.status === 'PENDENTE'
+          }"
+        >
+          {{
+            order.status === 'PENDENTE'
+              ? 'Iniciar preparo'
+              : order.status === 'EM_PREPARO'
+              ? 'Marcar como pronto'
+              : ''
+          }}
+        </button>
       </div>
     </main>
   </div>
@@ -65,78 +60,68 @@
 
 <script>
 import "./KitchenOrders.css";
+import orderService from "@/service/ordersService";
+
 export default {
   name: "KitchenOrders",
   data() {
     return {
-      orders: [
-        {
-          id: 101,
-          time: "12:34",
-          status: "new",
-          createdAt: new Date(new Date() - 5 * 60000),
-          observation: "Sem cebola, com borda recheada",
-          items: [
-            { name: "Pizza Margherita", quantity: 2 },
-            { name: "Coca-Cola 350ml", quantity: 2 },
-          ],
-        },
-        {
-          id: 102,
-          time: "12:36",
-          status: "new",
-          createdAt: new Date(new Date() - 12 * 60000),
-          observation: "Fritas bem crocantes",
-          items: [
-            { name: "Burger", quantity: 1 },
-            { name: "Fritas", quantity: 1 },
-          ],
-        },
-      ],
-
+      orders: [],
       filterStatus: "All",
       statusLabels: {
         All: "Todos",
-        New: "Novos",
-        InProgress: "Em preparo",
-        Completed: "Prontos",
+        PENDENTE: "Pendentes",
+        EM_PREPARO: "Em preparo",
+        PRONTO: "Prontos",
       },
     };
   },
   computed: {
     filteredOrders() {
-      return this.orders
-        .map((order) => ({
-          ...order,
-          waitingMinutes: Math.floor((new Date() - order.createdAt) / 60000),
-        }))
-        .filter((order) => {
-          if (this.filterStatus === "All") return true;
-          return order.status === this.filterStatus.toLowerCase();
-        });
+      if (this.filterStatus === "All") return this.orders;
+      return this.orders.filter((o) => o.status === this.filterStatus);
     },
   },
   methods: {
-    advanceStatus(orderId) {
+    // mapeia o status do backend para as classes CSS originais
+    statusClass(status) {
+      if (!status) return "";
+      switch (status) {
+        case "PENDENTE":
+          return "new";
+        case "EM_PREPARO":
+          return "inProgress";
+        case "PRONTO":
+          return "completed";
+        default:
+          return "";
+      }
+    },
+
+    async loadOrders() {
+      try {
+        const data = await orderService.getAllPedidos();
+        this.orders = data;
+      } catch (err) {
+        console.error("Erro ao carregar pedidos:", err);
+      }
+    },
+
+    async advanceStatus(orderId) {
       const order = this.orders.find((o) => o.id === orderId);
       if (!order) return;
 
-      if (order.status === "new") {
-        order.status = "inProgress";
-      } else if (order.status === "inProgress") {
-        order.status = "completed";
-      }
+      if (order.status === "PENDENTE") order.status = "EM_PREPARO";
+      else if (order.status === "EM_PREPARO") order.status = "PRONTO";
+      await orderService.updateStatus(orderId, order.status);
     },
   },
-
   mounted() {
-    this.interval = setInterval(() => {
-      this.orders = [...this.orders];
-    }, 60000);
+    this.loadOrders();
+    this.interval = setInterval(() => this.loadOrders(), 60000);
   },
   unmounted() {
     clearInterval(this.interval);
   },
 };
 </script>
-
