@@ -1,13 +1,9 @@
 <template>
   <div class="home-root">
   <div class="home-page">
-      <div class="logo-area">
-        <!-- <img src="/images/tokaname.png" alt="Toka Snooker Bar Logo" class="logo-icon" /> -->
-        <span class="logo-text"></span> 
-      </div>
     <section class="hero-section">
       <div class="hero-image-container">
-        <!-- <img src="/images/toka.jpg" alt="Interior do Toka Snooker Bar" class="main-bar-photo" /> -->
+        <img src="/images/toka.jpg" alt="Interior do Toka Snooker Bar" class="main-bar-photo" />
       </div>
 
       <div class="welcome-content">
@@ -16,9 +12,9 @@
           <p>O ponto de encontro ideal para quem curte boa música, diversão entre amigos e aquele clima descontraído de bar e restaurante. Aqui você encontra mesas de sinuca, drinks variados, porções caprichadas e, claro, muito karaokê para soltar a voz!</p>
         </div>
         <div class="mini-gallery horizontal-scroll">
-          <!-- <img src="/images/karaoke.jpg" alt="Karaokê" class="mini-photo" />
+          <img src="/images/karaoke.jpg" alt="Karaokê" class="mini-photo" />
           <img src="/images/sinuca.jpg" alt="Sinuca" class="mini-photo" />
-          <img src="/images/bar1.jpg" alt="Bar 1" class="mini-photo" /> -->
+          <img src="/images/bar1.jpg" alt="Bar 1" class="mini-photo" />
         </div>
       </div>
     </section>
@@ -34,11 +30,11 @@
 
     <section class="gallery-map-section">
       <div class="gallery-container horizontal-scroll">
-        <!-- <img src="/images/placa.jpg" alt="Placa Toka" class="gal-photo" />
+        <img src="/images/placa.jpg" alt="Placa Toka" class="gal-photo" />
         <img src="/images/conheca.jpg" alt="Bar" class="gal-photo" />
         <img src="/images/bar.jpg" alt="Prateleiras do Bar" class="gal-photo" />
         <img src="/images/drink%20toka.jpg" alt="Drink Toka" class="gal-photo" />
-        <img src="/images/mojito.jpg" alt="Drink Mojito" class="gal-photo" /> -->
+        <img src="/images/mojito.jpg" alt="Drink Mojito" class="gal-photo" />
       </div>
       
       <div class="map-container">

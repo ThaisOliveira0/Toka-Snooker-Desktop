@@ -114,23 +114,6 @@
   gap: 16px;
 }
 
-.order-item-card {
-  background-color: #f9f9f9;
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.order-item-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0,0,0,0.12);
-}
-
 .item-icon {
   width: 48px;
   height: 48px;
@@ -138,7 +121,8 @@
 }
 
 .item-info h3 {
-  margin: 0;
+  margin-bottom: 20px;
+  margin-right: 20px;
   font-size: 16px;
   text-align: center;
 }
@@ -207,6 +191,7 @@
   padding: 0;
   margin: 0;
   flex: 1;
+  max-height: 70%;
   overflow-y: auto;
 }
 
@@ -282,24 +267,118 @@
 
 .order-info {
   display: flex;
-  flex-wrap: nowrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 20px;
+  flex-direction: column;
+  gap: 24px; /* espaço entre linhas, se houverem mais */
   padding: 24px;
-  margin: 0 24px 20px;
+  margin: 0 24px 24px;
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-  font-family: 'Poppins', sans-serif;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.06);
 }
 
-.order-field {
+.order-id-field {
   display: flex;
   flex-direction: column;
-  flex: 1;
   gap: 6px;
 }
+
+.order-id-label-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4px; /* reduz a distância do input para o label */
+}
+
+.order-id-field input {
+  margin-top: 0; /* remove qualquer margem superior */
+  padding: 8px 12px; /* altura menor para ficar mais compacto */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+.new-order-btn {
+  background-color: #2e7d32;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.new-order-btn:hover {
+  background-color: #256b29;
+}
+
+.order-id-field input[type="number"] {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+}
+
+.order-row {
+  display: flex;
+  gap: 24px;
+}
+
+.order-row .order-field {
+  flex: 1; /* cada quadrante ocupa 1/3 */
+  display: flex;
+  flex-direction: column;
+}
+
+.order-field label {
+  font-weight: 600;
+  color: #305532;
+  font-size: 0.9rem;
+  margin-bottom: 4px;
+}
+
+.order-field input {
+  padding: 10px 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.order-id-label-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0px;
+}
+
+.new-order-btn {
+  background-color: #2e7d32;
+  color: #fff;
+  border: none;
+  padding: 6px 6px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 0px;
+}
+
+.new-order-btn:hover {
+  background-color: #256b29;
+}
+
+.new-order-btn.active {
+  background-color: #1b4d1b; /* cor diferente para indicar selecionado */
+  box-shadow: 0 0 0 2px rgba(46, 125, 50, 0.4);
+}
+
 
 .order-field label {
   font-weight: 600;
@@ -348,7 +427,7 @@
 
 .order-id-row input[type="number"] {
   width: 100%;
-  max-width: 400px; /* controla a largura sem esticar demais */
+  max-width: 400px; 
   padding: 10px 12px;
   border: 1px solid #ccc;
   border-radius: 8px;
@@ -414,4 +493,39 @@
   background-color: #43a047;
   transform: translateY(-1px);
   box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+.order-item-card {
+  position: relative;
+  background: #fff;
+  border-radius: 10px;
+  padding: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: transform 0.2s ease;
+}
+
+.order-item-card:hover {
+  transform: scale(1.02);
+}
+
+.edit-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: transparent;
+  border: none;
+  color: #000000;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+  transition: background 0.3s;
+}
+
+.edit-btn:hover {
+  background: #dbdbdb;
 }

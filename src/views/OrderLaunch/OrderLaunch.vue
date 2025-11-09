@@ -2,33 +2,46 @@
   <div class="order-launch">
     <header class="order-header">
       <h4>Lançamento de Pedido</h4>
-      <button class="new-product-btn" @click="openNewProductModal">+ Novo Produto</button>
+      <button v-if="isAdmin" class="new-product-btn" @click="openNewProductModal">
+        + Novo Produto
+      </button>
+
     </header>
 
-    <section class="order-info">
-      <div class="order-field">
-        <label for="table-number">Mesa:</label>
-        <input id="table-number" type="number" v-model="tableNumber" placeholder="Número da mesa" />
-      </div>
+<section class="order-info">
+  <div class="order-row">
 
-      <div class="order-field order-id-field">
+    <div class="order-field">
+      <label for="table-number">Mesa:</label>
+      <input id="table-number" type="number" v-model="tableNumber" placeholder="Número da mesa" />
+    </div>
+
+    <div class="order-field order-id-field">
+      <div class="order-id-label-row">
         <label for="order-id">ID da Comanda:</label>
-        <div class="order-id-row">
-          <input id="order-id" type="number" v-model="comandaId" :disabled="novaComanda" placeholder="Digite o ID" />
+        <!-- <button 
+        :class="['new-order-btn', { active: novaComanda }]" 
+        @click="novaComanda = !novaComanda"
+        >
+        Criar nova comanda
+      </button> -->
+    </div>
+    <input
+    id="order-id"
+    type="number"
+    v-model="comandaId"
+    :disabled="novaComanda"
+    placeholder="Digite o ID"
+    />
+  </div>
+  <div class="order-field">
+    <label for="observacao">Observação:</label>
+    <input id="observacao" type="text" v-model="observacao" placeholder="Ex: sem molho, bem passado..." />
+  </div>
 
-          <div class="checkbox-field below">
-            <input type="checkbox" id="nova" v-model="novaComanda" />
-            <label for="nova">Criar nova comanda</label>
-          </div>
-        </div>
+  </div>
+</section>
 
-      </div>
-
-      <div class="order-field full-width">
-        <label for="observacao">Observação:</label>
-        <textarea id="observacao" v-model="observacao" placeholder="Ex: sem molho, bem passado..."></textarea>
-      </div>
-    </section>
 
     <main class="order-content">
       <section class="order-products">
@@ -55,7 +68,10 @@
                 <button @click="addItem(item)">+</button>
               </div>
             </div>
-            <button class="edit-btn" @click="openEditProductModal(item)">Editar</button>
+            <button v-if="isAdmin" class="edit-btn" @click="openEditProductModal(item)" title="Editar produto">
+             <i class="fas fa-edit"></i>
+            </button>
+
           </div>
         </div>
       </section>
@@ -104,7 +120,10 @@ import orderService from "../../service/ordersService.js";
 import productService from "../../service/productService.js";
 import NewProduct from "./Components/NewProduct.vue";
 import "./orderLaunch.css";
+import { getDecodedToken } from "../../service/authService.js";
 
+const decoded = getDecodedToken();
+const isAdmin = decoded?.role === "admin";
 const toast = useToast();
 
 const tableNumber = ref("");
