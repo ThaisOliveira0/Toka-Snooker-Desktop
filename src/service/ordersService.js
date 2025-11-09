@@ -43,8 +43,6 @@ async getAllComandas() {
   }
 },
 async updateStatus(id, status) {
-  console.log(id, status);
-  
     try {
       const response = await api.put(`/pedidos/${id}`, { status });
       return response.data;

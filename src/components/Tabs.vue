@@ -13,25 +13,39 @@
           {{ tab.name }}
         </button>
       </div>
-      <button class="login-btn" @click="login">
+
+      <button 
+        v-if="!isLoggedIn"
+        class="login-btn"
+        @click="login"
+      >
         Login
       </button>
+
+      <img
+        v-else
+        src="../assets/user-icon.png"
+        alt="User"
+        class="user-icon"
+        @click="goToProfile"
+      />
     </nav>
   </div>
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 
 const props = defineProps({
-  tabs: {
-    type: Array, }
+  tabs: Array
 })
 
 const router = useRouter()
 const route = useRoute()
-const selectedTab = ref(route.path)  
+
+const selectedTab = ref(route.path)
+const isLoggedIn = ref(false)
 
 watch(
   () => route.path,
@@ -41,15 +55,24 @@ watch(
   { immediate: true }
 )
 
+onMounted(() => {
+  const token = sessionStorage.getItem('token')
+  isLoggedIn.value = !!token
+})
+
 const selectTab = (tab) => {
   if (tab.path !== selectedTab.value) {
     selectedTab.value = tab.path
     router.push(tab.path)
   }
-
 }
-  const login = () => {
+
+const login = () => {
   router.push('/login')
+}
+
+const goToProfile = () => {
+  router.push('/perfil') 
 }
 </script>
 
@@ -62,7 +85,7 @@ const selectTab = (tab) => {
   gap: 2rem;
   border-bottom: 2px solid #eee;
   padding: 0.5rem 1rem;
-  background-color: #000000;
+  background-color: #000;
   font-family: 'Poppins', sans-serif;
 }
 
@@ -90,7 +113,7 @@ const selectTab = (tab) => {
   left: 0;
   width: 0%;
   height: 3px;
-  background-color: #ffffff; 
+  background-color: #ffffff;
   transition: width 0.3s;
   border-radius: 2px;
 }
@@ -111,7 +134,7 @@ const selectTab = (tab) => {
   width: 100%;
 }
 
-/* .login-btn {
+.login-btn {
   background-color: #f3cf2c;
   color: #000;
   padding: 0.5rem 1rem;
@@ -123,7 +146,12 @@ const selectTab = (tab) => {
 .login-btn:hover {
   background-color: #ffffff;
   color: #000;
-} */
+}
 
-
+.user-icon {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  cursor: pointer;
+}
 </style>

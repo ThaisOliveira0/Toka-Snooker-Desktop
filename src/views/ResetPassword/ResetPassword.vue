@@ -17,8 +17,31 @@
             Digite e confirme sua nova senha para concluir a redefinição.
           </p>
 
-          <input type="password" placeholder="Nova senha" v-model="novaSenha" />
-          <input type="password" placeholder="Confirmar nova senha" v-model="confirmarSenha" />
+          <div class="password-field">
+            <input
+              :type="showNovaSenha ? 'text' : 'password'"
+              placeholder="Nova senha"
+              v-model="novaSenha"
+            />
+            <i
+              class="fas"
+              :class="showNovaSenha ? 'fa-eye-slash' : 'fa-eye'"
+              @click="showNovaSenha = !showNovaSenha"
+            ></i>
+          </div>
+
+          <div class="password-field">
+            <input
+              :type="showConfirmarSenha ? 'text' : 'password'"
+              placeholder="Confirmar nova senha"
+              v-model="confirmarSenha"
+            />
+            <i
+              class="fas"
+              :class="showConfirmarSenha ? 'fa-eye-slash' : 'fa-eye'"
+              @click="showConfirmarSenha = !showConfirmarSenha"
+            ></i>
+          </div>
 
           <button class="reset-button" type="submit">
             Redefinir senha
@@ -45,6 +68,8 @@ const successMessage = ref("")
 const errorMessage = ref("")
 const userId = sessionStorage.getItem('recoveryUserId')
 
+const showNovaSenha = ref(false)
+const showConfirmarSenha = ref(false)
 
 async function handleResetPassword() {
   errorMessage.value = ""
@@ -64,7 +89,6 @@ async function handleResetPassword() {
     const response = await resetPassword(userId, novaSenha.value)
     if (response.sucesso) {
       successMessage.value = response.mensagem || "Senha redefinida com sucesso!"
-
       sessionStorage.removeItem('recoveryUserId')
       sessionStorage.removeItem('recoveryEmail')
       router.push("/login")
@@ -81,6 +105,5 @@ function goBack() {
   router.push('/')
 }
 </script>
-
 
 <style scoped src="./ResetPassword.css"></style>

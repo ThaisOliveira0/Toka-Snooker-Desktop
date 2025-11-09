@@ -36,11 +36,12 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="(m, i) in data.musica_pedido" :key="i">
-            <td>{{ m.nome }}</td>
-            <td>{{ m.quantidade }}</td>
-            <td>R$ {{ (m.valor_total * m.quantidade).toFixed(2) }}</td>
-          </tr>
+         <tr v-for="(m, i) in data.musica_pedido" :key="i">
+  <td>{{ m.nome }}</td>
+  <td>{{ m.quantidade }}</td>
+  <td>R$ {{ (3 * m.quantidade).toFixed(2) }}</td>
+</tr>
+
           <tr v-if="!data.musica_pedido || data.musica_pedido.length === 0">
             <td colspan="3">Nenhum serviço de karaokê.</td>
           </tr>
@@ -72,7 +73,7 @@ const total = computed(() => {
     0
   );
   const musicaSum = (props.data.musica_pedido || []).reduce(
-    (sum, m) => sum + m.valor_total * m.quantidade,
+    (sum, m) => sum + 3 * m.quantidade,
     0
   );
   return pedidosSum + musicaSum;

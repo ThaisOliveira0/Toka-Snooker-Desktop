@@ -50,24 +50,23 @@ onMounted(async () => {
 
 const orders = computed(() =>
   comandas.value.map(comanda => ({
-    mesa: `Mesa ${comanda.mesa?.toString().padStart(2, "0")}`,
+    mesa: `Mesa ${String(comanda.mesa ?? '??').padStart(2, "0")}`,
     pedido: (comanda.pedido || []).flatMap(p =>
       (p.itens || []).map(item => ({
-        nome: item.nome,
-        quantidade: item.quantidade,
-        valor_total: item.valor_unit, 
+        nome: item.nome ?? "Item desconhecido",
+        quantidade: Number(item.quantidade) || 1,
+        valor_total: Number(item.valor_unit) || 3,
         status: p.status,
         observacao: p.observacao
       }))
     ),
     musica_pedido: (comanda.musica_pedido || []).map(m => ({
-      nome: m.nome,
-      quantidade: m.quantidade,
-      valor_total: m.valor_total
+      nome: m.nome ?? "Música desconhecida",
+      quantidade: Number(m.qtde_pedidos) || 1,
+      valor_total: Number(m.valor) || 0
     }))
   }))
 );
-
 
 const filteredOrders = computed(() => {
   if (!search.value.trim()) return orders.value;
@@ -87,16 +86,14 @@ function handleClose(comanda) {
     })),
     musica_pedido: (comanda.musica_pedido || []).map(m => ({
       nome: m.nome || "Música desconhecida",
-      quantidade: Number(m.quantidade) || 1,
-      valor_total: Number(m.valor_total) || 0
+      quantidade: Number(m.qtde_pedidos) || 1,
+      valor_total: Number(m.valor) || 0
     }))
   };
 
   sessionStorage.setItem("selectedOrder", JSON.stringify(safeComanda));
   router.push({ name: "Payment" });
 }
-
 </script>
-
 
 <style src="./tabs.css"></style>
