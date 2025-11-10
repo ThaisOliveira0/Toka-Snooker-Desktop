@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import jwt_decode from 'jwt-decode'
 import Login from '@/views/Login/Login.vue'
 import AdmReport from '@/views/AdmReport/AdmReport.vue'
 import Register from '@/views/Register/Register.vue'
@@ -93,6 +94,28 @@ const routes = [
 const router = createRouter({
   history: createWebHistory(),
   routes
+})
+
+router.beforeEach((to, from, next) => {
+  const token = sessionStorage.getItem('token')
+
+  if (!to.meta.roles) return next()
+
+  if (!token) return next('/login')
+
+  try {
+    const decoded = jwt_decode(token)
+    const userRole = decoded.role || decoded.tipo_usuario 
+
+    if (!userRole || !to.meta.roles.includes(userRole)) {
+      return next('/')
+    }
+
+    next()
+  } catch (error) {
+    sessionStorage.removeItem('token')
+    next('/login')
+  }
 })
 
 export default router
