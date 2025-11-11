@@ -31,7 +31,7 @@
 import { useRouter } from "vue-router"; 
 import TableCard from "@/components/TableCard.vue";
 import { onMounted, ref, computed } from "vue";
-import orderService from "../../service/ordersService";
+import tabsService from "../../service/tabsService";
 
 const comandas = ref([]);
 const search = ref("");
@@ -40,7 +40,7 @@ const cardsContainer = ref(null);
 
 onMounted(async () => {
   try {
-    const response = await orderService.getAllComandas(); 
+    const response = await tabsService.getAllComandas(); 
     comandas.value = response || []; 
     console.log("Comandas recebidas:", comandas.value);
   } catch (err) {

@@ -42,22 +42,56 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/service/authService'
+import { useToast } from 'vue-toastification'
 
 const email = ref('')
 const senha = ref('')
 const errorMessage = ref('')
 const router = useRouter()
+const toast = useToast()
 
- async function handleLogin() {
+async function handleLogin() {
+  errorMessage.value = '' 
+
+  if (!email.value || !senha.value) {
+    toast.warning('Por favor, preencha todos os campos.', { position: 'top-right' })
+    return
+  }
+
   try {
-    const { token } = await login(email.value, senha.value)
+    const { token, role } = await login(email.value, senha.value)
 
     if (token) {
-      window.dispatchEvent(new Event('login-status-changed')) 
-      router.push('/') 
+      toast.success('Login realizado com sucesso!', { position: 'top-right' })
+      window.dispatchEvent(new Event('login-status-changed'))
+      router.push('/')
     }
   } catch (error) {
     console.error('Erro no login:', error)
+
+    if (error.response) {
+      const status = error.response.status
+
+      switch (status) {
+        case 400:
+          errorMessage.value = 'Dados inválidos. Verifique o e-mail e senha.'
+          break
+        case 401:
+          errorMessage.value = 'E-mail ou senha incorretos ou não autorizados.'
+          break
+        case 404:
+          errorMessage.value = 'E-mail não encontrado. Verifique e tente novamente.'
+          break
+        case 500:
+          errorMessage.value = 'Erro interno no servidor. Tente novamente mais tarde.'
+          break
+        default:
+          errorMessage.value = `Erro inesperado (${status}).`
+      }
+    } else {
+      errorMessage.value = 'Falha de conexão. Verifique sua internet.'
+      toast.error(errorMessage.value, { position: 'top-right' })
+    }
   }
 }
 

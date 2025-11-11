@@ -11,17 +11,6 @@ const api = axios.create({
 
 export default {
 
-
-async getAllComandas() {
-    try {
-      const response = await api.get("/comandas");
-
-      return response.data; 
-    } catch (error) {
-      console.error("Erro ao buscar comandas:", error);
-      return { sucesso: false, mensagem: "Erro ao buscar comandas.", dados: [] };
-    }
-  },
   async createPedido(pedido) { 
     try {
       const response = await api.post("/pedidos", pedido);
@@ -52,13 +41,5 @@ async updateStatus(id, status) {
     }
   },
 
-async closeTab(id) {
-    try {
-      const response = await api.patch(`/comandas/${id}/fechar`);
-      return response.data;
-    } catch (error) {
-      console.error("Erro ao fechar a comanda:", error);
-      return { sucesso: false, mensagem: "Erro ao fechar a comanda:" };
-    }
-  },
+
 };

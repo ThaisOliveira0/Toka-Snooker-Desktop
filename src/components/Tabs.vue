@@ -39,7 +39,7 @@ const route = useRoute()
 const selectedTab = ref(route.path)
 const isLoggedIn = ref(false)
 const userLabel = ref('Usuário logado')
-const showDropdown = ref(true)
+const showDropdown = ref(false)
 const menuRef = ref(null)
 
 watch(
@@ -149,11 +149,6 @@ onUnmounted(() => {
   border-radius: 5px;
   font-weight: 600;
   transition: background 0.3s, color 0.3s;
-}
-
-.login-btn:hover {
-  background-color: #fff;
-  color: #000;
 }
 
 .user-menu {

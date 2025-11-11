@@ -79,9 +79,6 @@
             <button class="btn secondary" @click="toggleSplit">
               <i class="fa-solid fa-users"></i> Dividir Conta
             </button>
-            <button class="btn secondary" @click="editOrder">
-              Editar Comanda
-            </button>
 
             <div v-if="showSplit" class="split-modal">
               <label for="people">Quantidade de pessoas:</label>
@@ -111,7 +108,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import ordersService from "../../service/ordersService";
+import tabService from "../../service/tabsService";
 import { useRouter } from "vue-router";
 import "./Payment.css";
 
@@ -186,7 +183,7 @@ const makePayment = async () => {
 
     alert(`Pagamento de R$ ${total.value.toFixed(2)} efetuado com sucesso!`)
 
-    const response = await ordersService.closeTab(idComanda)
+    const response = await tabService.closeTab(idComanda)
 
     if (response.sucesso === false) {
       alert("Erro ao fechar comanda.")

@@ -1,5 +1,6 @@
 import axios from 'axios';
-import jwt_decode from 'jwt-decode'; 
+import jwt_decode from 'jwt-decode';
+import { useToast } from "vue-toastification";
 
 const API_URL = 'http://localhost:3000';
 
@@ -12,7 +13,7 @@ export async function login(email, senha) {
       sessionStorage.setItem('token', token);
 
       const decoded = jwt_decode(token);
-      const { id, role } = decoded;  
+      const { id, role } = decoded;
 
       return { token, id, role };
     }
@@ -81,7 +82,9 @@ export function globalLogout() {
 
 
 export function startSessionTimer() {
-  const SESSION_LIMIT = 60 *  60 * 1000 
+  const toast = useToast();
+
+  const SESSION_LIMIT =  60* 60 * 1000
 
   function updateActivity() {
     sessionStorage.setItem('lastActivity', Date.now())
@@ -91,10 +94,17 @@ export function startSessionTimer() {
     const last = parseInt(sessionStorage.getItem('lastActivity') || '0')
     const now = Date.now()
 
-    if (now - last > SESSION_LIMIT) {
-      globalLogout()
-      alert('Sua sessão expirou por inatividade.')
-    }
+if (now - last > SESSION_LIMIT) {
+  toast.warning('Sua sessão expirou por inatividade.', {
+    timeout: 3000,
+    position: "top-right",
+    closeOnClick: true,
+    pauseOnHover: true,
+  })
+  setTimeout(() => {
+    globalLogout()
+  }, 3000) 
+}
   }
 
   window.addEventListener('mousemove', updateActivity)

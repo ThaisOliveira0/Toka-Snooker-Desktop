@@ -59,8 +59,10 @@ async function handlePasswordReset() {
   errorMessage.value = "";
   successMessage.value = "";
 
+  const toast = useToast();
+
   if (!email.value) {
-    errorMessage.value = "Por favor, insira seu e-mail.";
+    toast.warning("Por favor, insira seu e-mail.", { position: "top-right" });
     return;
   }
 
@@ -70,19 +72,50 @@ async function handlePasswordReset() {
     const response = await sendCode(email.value);
 
     if (response) {
-      successMessage.value = response.message || "Código enviado com sucesso!";
+      toast.success(response.message || "Código enviado com sucesso!", {
+        position: "top-right",
+      });
       sessionStorage.setItem("recoveryEmail", email.value);
       router.push("/inserir-codigo");
     } else {
-      errorMessage.value = response.message || "Erro ao enviar o código.";
+      toast.error("Não foi possível enviar o código. Tente novamente.", {
+        position: "top-right",
+      });
     }
   } catch (error) {
     console.error(error);
-    errorMessage.value = "Erro no servidor. Tente novamente mais tarde.";
+
+    // 🔍 Verifica o status HTTP e mostra mensagens específicas
+    if (error.response) {
+      const status = error.response.status;
+
+      switch (status) {
+        case 400:
+          toast.warning("E-mail inválido ou mal formatado.", { position: "top-right" });
+          break;
+        case 401:
+          toast.error("E-mail não autorizado ou não cadastrado.", { position: "top-right" });
+          break;
+        case 404:
+          toast.error("E-mail não encontrado no sistema.", { position: "top-right" });
+          break;
+        case 500:
+          toast.error("Erro interno do servidor. Tente novamente mais tarde.", { position: "top-right" });
+          break;
+        default:
+          toast.error(`Erro inesperado (${status}).`, { position: "top-right" });
+      }
+    } else {
+      // Caso o erro seja de rede (sem resposta do servidor)
+      toast.error("Falha na conexão. Verifique sua internet e tente novamente.", {
+        position: "top-right",
+      });
+    }
   } finally {
     loading.value = false;
   }
 }
+
 
 function goBack() {
   router.push("/");
