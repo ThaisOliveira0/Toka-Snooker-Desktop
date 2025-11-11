@@ -75,7 +75,7 @@
                 </td>
 
                 <td class="actions">
-                  <button class="edit-btn" @click="openModal(item)">
+                  <button class="edit-btn-control" @click="openModal(item)">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button class="remove-btn" @click="requestDelete(item)">

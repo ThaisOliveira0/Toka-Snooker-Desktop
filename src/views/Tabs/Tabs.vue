@@ -50,6 +50,7 @@ onMounted(async () => {
 
 const orders = computed(() =>
   comandas.value.map(comanda => ({
+    id: comanda.id,
     mesa: `Mesa ${String(comanda.mesa ?? '??').padStart(2, "0")}`,
     pedido: (comanda.pedido || []).flatMap(p =>
       (p.itens || []).map(item => ({
@@ -77,23 +78,26 @@ const filteredOrders = computed(() => {
 });
 
 function handleClose(comanda) {
+  
   const safeComanda = {
+    id: comanda.id ,
     mesa: comanda.mesa || "Mesa desconhecida",
     pedido: (comanda.pedido || []).map(p => ({
       nome: p.nome || "Item desconhecido",
       quantidade: Number(p.quantidade) || 1,
-      valor_total: Number(p.valor_total) || 0
+      valor_total: Number(p.valor_total ?? p.valor_unit ?? 0)
     })),
     musica_pedido: (comanda.musica_pedido || []).map(m => ({
       nome: m.nome || "Música desconhecida",
       quantidade: Number(m.qtde_pedidos) || 1,
-      valor_total: Number(m.valor) || 0
+      valor_total: Number(m.valor_total ?? m.valor ?? 3)
     }))
   };
 
   sessionStorage.setItem("selectedOrder", JSON.stringify(safeComanda));
   router.push({ name: "Payment" });
 }
+
 </script>
 
 <style src="./tabs.css"></style>

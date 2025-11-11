@@ -51,4 +51,14 @@ async updateStatus(id, status) {
       return { sucesso: false, mensagem: "Erro ao atualizar status do pedido." };
     }
   },
+
+async closeTab(id) {
+    try {
+      const response = await api.patch(`/comandas/${id}/fechar`);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao fechar a comanda:", error);
+      return { sucesso: false, mensagem: "Erro ao fechar a comanda:" };
+    }
+  },
 };

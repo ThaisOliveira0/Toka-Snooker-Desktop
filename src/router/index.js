@@ -56,7 +56,7 @@ const routes = [
     path: '/karaoke',
     name: 'Karaoke',
     component: Karaoke,
-    meta: { roles: ['funcionario'] }
+    meta: { roles: ['funcionario','admin'] }
   },
   {
     path: '/pedidos',

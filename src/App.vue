@@ -7,6 +7,13 @@
 import Tabs from './components/Tabs.vue'
 import { computed } from 'vue'
 import { getDecodedToken } from './service/authService.js'
+import { onMounted } from 'vue'
+import { startSessionTimer } from './service/authService.js'
+
+onMounted(() => {
+  startSessionTimer()
+})
+
 
 const allTabs = [
   { name: 'Home', path: '/' },
@@ -19,11 +26,8 @@ const allTabs = [
   { name: 'Cozinha', path: '/cozinha', roles: ['admin', 'funcionario'] },
 ]
 
-
 const decoded = getDecodedToken()
 const userRole = decoded?.role || null
-
-console.log('👤 Role do usuário:', userRole)
 
 const filteredTabs = computed(() =>
   allTabs.filter(tab => !tab.roles || tab.roles.includes(userRole))

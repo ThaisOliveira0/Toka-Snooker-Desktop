@@ -6,9 +6,9 @@
       </div>
 
       <div class="auth-side right">
-        <form class="auth-form">
+        <form class="auth-form" @submit.prevent="handleLogin" @keydown.enter.prevent="handleLogin">
           <button class="back-button" @click.prevent="goBack">
-             <i class="fas fa-arrow-left"></i> 
+            <i class="fas fa-arrow-left"></i>
           </button>
           <h2>Login</h2>
           <div class="avatar">
@@ -18,7 +18,8 @@
           <input type="email" placeholder="E-mail" v-model="email" />
           <input type="password" placeholder="Senha" v-model="senha" />
 
-          <button class="auth-button" @click.prevent="handleLogin">
+
+          <button type="submit" class="auth-button" @click.stop="handleLogin">
             Entrar
           </button>
 
@@ -30,6 +31,8 @@
 
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </form>
+
+
       </div>
     </div>
   </div>
@@ -45,16 +48,16 @@ const senha = ref('')
 const errorMessage = ref('')
 const router = useRouter()
 
-async function handleLogin() {
+ async function handleLogin() {
   try {
-    if (!email.value || !senha.value) {
-      errorMessage.value = 'Preencha todos os campos.'
-      return
+    const { token } = await login(email.value, senha.value)
+
+    if (token) {
+      window.dispatchEvent(new Event('login-status-changed')) 
+      router.push('/') 
     }
-    await login(email.value, senha.value)
-    router.push('/comandas')
-  } catch {
-    errorMessage.value = 'Login falhou. Verifique seus dados.'
+  } catch (error) {
+    console.error('Erro no login:', error)
   }
 }
 

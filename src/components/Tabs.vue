@@ -2,40 +2,32 @@
   <div class="tabs-component">
     <nav class="tab-header" role="tablist">
       <div class="tabs">
-        <button
-          v-for="tab in tabs"
-          :key="tab.path"
-          :class="{ active: tab.path === selectedTab }"
-          @click="selectTab(tab)"
-          role="tab"
-          :aria-selected="tab.path === selectedTab"
-        >
+        <button v-for="tab in tabs" :key="tab.path" :class="{ active: tab.path === selectedTab }"
+          @click="selectTab(tab)">
           {{ tab.name }}
         </button>
       </div>
 
-      <button 
-        v-if="!isLoggedIn"
-        class="login-btn"
-        @click="login"
-      >
-        Login
-      </button>
+      <button v-if="!isLoggedIn" class="login-btn" @click="login">Login</button>
 
-      <img
-        v-else
-        src="../assets/user-icon.png"
-        alt="User"
-        class="user-icon"
-        @click="goToProfile"
-      />
+      <div v-else class="user-menu" ref="menuRef">
+        <img src="../assets/user-icon.png" alt="User" class="user-icon" @click.stop="toggleDropdown" />
+
+        <div v-show="showDropdown" class="dropdown-menu">
+          <p class="user-email">{{ userLabel }}</p>
+          <button class="logout-btn" @click="logoutUser">Sair</button>
+        </div>
+      </div>
+
+
     </nav>
   </div>
 </template>
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { logout } from '@/service/authService'
 
 const props = defineProps({
   tabs: Array
@@ -46,6 +38,9 @@ const route = useRoute()
 
 const selectedTab = ref(route.path)
 const isLoggedIn = ref(false)
+const userLabel = ref('Usuário logado')
+const showDropdown = ref(true)
+const menuRef = ref(null)
 
 watch(
   () => route.path,
@@ -55,25 +50,59 @@ watch(
   { immediate: true }
 )
 
-onMounted(() => {
+function checkLogin() {
   const token = sessionStorage.getItem('token')
   isLoggedIn.value = !!token
-})
 
-const selectTab = (tab) => {
+  if (token) {
+    try {
+      const decoded = JSON.parse(atob(token.split('.')[1]))
+      userLabel.value = decoded.email || 'Usuário logado'
+    } catch {
+      userLabel.value = 'Usuário logado'
+    }
+  }
+}
+
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+}
+
+function handleClickOutside(e) {
+  if (menuRef.value && !menuRef.value.contains(e.target)) {
+    showDropdown.value = false
+  }
+}
+
+function logoutUser() {
+  logout() 
+  showDropdown.value = false
+  isLoggedIn.value = false
+  window.dispatchEvent(new Event('login-status-changed'))
+  router.push('/')
+}
+
+function login() {
+  router.push('/login')
+}
+
+function selectTab(tab) {
   if (tab.path !== selectedTab.value) {
     selectedTab.value = tab.path
     router.push(tab.path)
   }
 }
 
-const login = () => {
-  router.push('/login')
-}
+onMounted(() => {
+  checkLogin()
+  window.addEventListener('login-status-changed', checkLogin)
+  document.addEventListener('click', handleClickOutside)
+})
 
-const goToProfile = () => {
-  router.push('/perfil') 
-}
+onUnmounted(() => {
+  window.removeEventListener('login-status-changed', checkLogin)
+  document.removeEventListener('click', handleClickOutside)
+})
 </script>
 
 <style scoped>
@@ -101,37 +130,16 @@ const goToProfile = () => {
   font-weight: 600;
   font-size: 15px;
   cursor: pointer;
-  position: relative;
-  transition: color 0.3s;
   color: #f3cf2c;
-}
-
-.tab-header button::after {
-  content: '';
-  position: absolute;
-  bottom: -2px;
-  left: 0;
-  width: 0%;
-  height: 3px;
-  background-color: #ffffff;
-  transition: width 0.3s;
-  border-radius: 2px;
+  transition: color 0.3s;
 }
 
 .tab-header button.active {
-  color: #ffffff;
-}
-
-.tab-header button.active::after {
-  width: 100%;
+  color: #fff;
 }
 
 .tab-header button:hover {
-  color: #ffffff;
-}
-
-.tab-header button:hover::after {
-  width: 100%;
+  color: #fff;
 }
 
 .login-btn {
@@ -144,8 +152,13 @@ const goToProfile = () => {
 }
 
 .login-btn:hover {
-  background-color: #ffffff;
+  background-color: #fff;
   color: #000;
+}
+
+.user-menu {
+  position: relative;
+  display: inline-block;
 }
 
 .user-icon {
@@ -154,4 +167,107 @@ const goToProfile = () => {
   border-radius: 50%;
   cursor: pointer;
 }
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: 120%;
+  background-color: #fff;
+  color: #000;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  padding: 0.8rem 1rem;
+  width: 180px;
+  z-index: 9999;
+}
+
+.user-email {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 0.6rem;
+  word-break: break-word;
+}
+
+.logout-btn {
+  background-color: #f3cf2c;
+  color: #000;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.logout-btn:hover {
+  background-color: #000;
+  color: #fff;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+.user-menu {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 120%;
+  right: 0;
+  background: #fff;
+  color: #000;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  padding: 0.8rem 1rem;
+  width: 180px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  animation: fadeIn 0.2s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-email {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 0.6rem;
+  word-break: break-word;
+}
+
+.logout-btn {
+  background: #f3cf2c;
+  color: #000;
+  border: none;
+  padding: 0.4rem 1rem;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  text-align: center;
+}
+
+.logout-btn:hover {
+  background: #000;
+  color: #fff;
+}
+
 </style>

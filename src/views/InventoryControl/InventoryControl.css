@@ -231,7 +231,7 @@ td.actions button i {
   transition: transform 0.2s ease;
 }
 
-td.actions .edit-btn i {
+td.actions .edit-btn-control i {
   color: #2a793d;
 }
 

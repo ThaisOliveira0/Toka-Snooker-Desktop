@@ -111,6 +111,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from "vue";
+import ordersService from "../../service/ordersService";
 import { useRouter } from "vue-router";
 import "./Payment.css";
 
@@ -122,6 +123,7 @@ const musica_pedido = ref([]);
 
 onMounted(() => {
   const saved = sessionStorage.getItem("selectedOrder");
+
   if (!saved) {
     router.push("/comandas");
     return;
@@ -129,12 +131,14 @@ onMounted(() => {
 
   const data = JSON.parse(saved);
 
+  console.log("Música Pedido:", data)
   mesa.value = data.mesa || "Mesa desconhecida";
   pedido.value = (data.pedido || []).map(p => ({
     nome: p.nome || "Item desconhecido",
     quantidade: Number(p.quantidade) || 1,
     valor_total: Number(p.valor_total) || 0
   }));
+
   musica_pedido.value = (data.musica_pedido || []).map(m => ({
     nome: m.nome || "Música desconhecida",
     quantidade: Number(m.quantidade) || 1,
@@ -164,9 +168,43 @@ const splitAmount = computed(() =>
 
 const toggleSplit = () => (showSplit.value = !showSplit.value);
 
-const makePayment = () => {
-  alert(`Pagamento de R$ ${total.value.toFixed(2)} efetuado com sucesso!`);
-};
+const makePayment = async () => {
+  try {
+    const saved = sessionStorage.getItem("selectedOrder")
+    if (!saved) {
+      alert("Nenhuma comanda selecionada.")
+      return
+    }
+
+    const data = JSON.parse(saved)
+    const idComanda = data.id
+
+    if (!idComanda) {
+      alert("ID da comanda não encontrado.")
+      return
+    }
+
+    alert(`Pagamento de R$ ${total.value.toFixed(2)} efetuado com sucesso!`)
+
+    const response = await ordersService.closeTab(idComanda)
+
+    if (response.sucesso === false) {
+      alert("Erro ao fechar comanda.")
+      console.error(response.mensagem)
+      return
+    }
+
+    alert("Comanda fechada com sucesso!")
+
+    sessionStorage.removeItem("selectedOrder")
+    router.push("/comandas")
+
+  } catch (error) {
+    console.error("Erro ao efetuar pagamento:", error)
+    alert("Ocorreu um erro ao fechar a comanda.")
+  }
+}
+
 
 const editOrder = () => {
   alert("Abrir tela de edição de comanda...");

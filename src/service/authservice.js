@@ -73,3 +73,37 @@ export async function resetPassword(id, senha) {
   return response.data
 }
 
+export function globalLogout() {
+  logout()
+  window.dispatchEvent(new Event('login-status-changed'))
+  window.location.href = '/'
+}
+
+
+export function startSessionTimer() {
+  const SESSION_LIMIT = 60 *  60 * 1000 
+
+  function updateActivity() {
+    sessionStorage.setItem('lastActivity', Date.now())
+  }
+
+  function checkInactivity() {
+    const last = parseInt(sessionStorage.getItem('lastActivity') || '0')
+    const now = Date.now()
+
+    if (now - last > SESSION_LIMIT) {
+      globalLogout()
+      alert('Sua sessão expirou por inatividade.')
+    }
+  }
+
+  window.addEventListener('mousemove', updateActivity)
+  window.addEventListener('keydown', updateActivity)
+  window.addEventListener('click', updateActivity)
+  window.addEventListener('scroll', updateActivity)
+
+
+  setInterval(checkInactivity, 30000)
+
+  updateActivity()
+}
