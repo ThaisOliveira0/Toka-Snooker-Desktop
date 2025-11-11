@@ -23,7 +23,18 @@
             <option value="admin">Administrador</option>
           </select>
 
-          <button class="register-button">Cadastrar</button>
+          <button class="register-button" type="submit" :disabled="loading">
+            <span
+              v-if="loading"
+              class="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+            <span v-if="!loading">Cadastrar</span>
+          </button>
+
+          <p v-if="erro" class="error-message">{{ erro }}</p>
+          <p v-if="sucesso" class="success-message">{{ sucesso }}</p>
 
           <p class="register-text">
             Já tem uma conta?

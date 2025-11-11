@@ -147,7 +147,9 @@ import ProductModal from "./Components/ProductModal.vue";
 import StockWithdrawal from "./Components/StockWithdrawal.vue";
 import "./inventoryControl.css";
 import inventoryService from "../../service/inventoryService";
+import { useToast } from 'vue-toastification'
 
+const toast = useToast()
 const searchQuery = ref("");
 const loading = ref(false);
 const saving = ref(false);
@@ -261,26 +263,29 @@ const saveItem = async (formData) => {
   };
 
   try {
-    if (editingItem.value) {
-      await inventoryService.updateItem(editingItem.value.id, payload);
+  if (editingItem.value) {
+     await inventoryService.updateItem(editingItem.value.id, payload);
       const index = items.value.findIndex((i) => i.id === editingItem.value.id);
       items.value[index] = { ...items.value[index], ...formData };
-    } else {
-      const newItem = await inventoryService.createItem(payload);
-      items.value.push({
-        ...newItem,
-        preco: newItem.preco_unit,
-        estoque: newItem.qtde_estoque,
-        qtde_min: newItem.qtde_min,
-      });
-    }
+    toast.success('Item atualizado com sucesso!')
+  } else {
+    const newItem = await inventoryService.createItem(payload);
+    items.value.push({
+      ...newItem,
+      preco: newItem.preco_unit,
+      estoque: newItem.qtde_estoque,
+      qtde_min: newItem.qtde_min,
+  });
+    toast.success('Item adicionado com sucesso!')
+  }
     await refreshInventory();
     closeModal();
-  } catch (error) {
-    console.error("Erro ao salvar item:", error);
-  } finally {
-    saving.value = false;
-  }
+} catch (error) {
+  console.error("Erro ao salvar item:", error);
+  toast.error('Erro ao salvar o item. Tente novamente.')
+} finally {
+  saving.value = false;
+}
 };
 
 const requestDelete = (item) => {
@@ -293,11 +298,13 @@ const handleConfirmDelete = async () => {
   try {
     await inventoryService.deleteItem(itemToDelete.value.id);
     items.value = items.value.filter((i) => i.id !== itemToDelete.value.id);
-  } catch (error) {
-    console.error("Erro ao excluir item:", error);
-  } finally {
+  toast.success('Item excluído com sucesso!')
+} catch (error) {
+   console.error("Erro ao excluir item:", error);
+  toast.error('Erro ao excluir o item. Tente novamente.')
+} finally {
     showConfirm.value = false;
     itemToDelete.value = null;
-  }
+}
 };
 </script>

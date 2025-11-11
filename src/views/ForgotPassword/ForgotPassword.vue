@@ -7,7 +7,7 @@
 
       <div class="auth-side right">
         <form class="auth-form" @submit.prevent="handlePasswordReset">
-          <button class="back-button" @click.prevent="goBack">
+          <button class="back-button" type="button" @click.prevent="goBack">
             <i class="fas fa-arrow-left"></i>
           </button>
 
@@ -54,15 +54,20 @@ const successMessage = ref("");
 const errorMessage = ref("");
 const loading = ref(false);
 const router = useRouter();
+const toast = useToast();
 
 async function handlePasswordReset() {
   errorMessage.value = "";
   successMessage.value = "";
 
-  const toast = useToast();
+  if (!email.value.trim()) {
+    toast.warning("Por favor, preencha o campo de e-mail.", { position: "top-right" });
+    return;
+  }
 
-  if (!email.value) {
-    toast.warning("Por favor, insira seu e-mail.", { position: "top-right" });
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email.value)) {
+    toast.warning("Por favor, insira um e-mail válido.", { position: "top-right" });
     return;
   }
 
@@ -85,7 +90,6 @@ async function handlePasswordReset() {
   } catch (error) {
     console.error(error);
 
-    // 🔍 Verifica o status HTTP e mostra mensagens específicas
     if (error.response) {
       const status = error.response.status;
 
@@ -106,7 +110,6 @@ async function handlePasswordReset() {
           toast.error(`Erro inesperado (${status}).`, { position: "top-right" });
       }
     } else {
-      // Caso o erro seja de rede (sem resposta do servidor)
       toast.error("Falha na conexão. Verifique sua internet e tente novamente.", {
         position: "top-right",
       });
