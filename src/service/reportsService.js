@@ -1,12 +1,10 @@
 import axios from "axios";
 
-const API_BASE_URL = "http://localhost:3000";
-
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: process.env.VUE_APP_BASE_URL,
   headers: {
-    "x-api-key": 12345,
-  },
+    'x-api-key': process.env.VUE_APP_API_KEY 
+  }
 });
 
 export default {
@@ -19,7 +17,6 @@ export default {
           dataFim: endDate,
         },
       });
-      console.log(response);
       
       return response.data;
     } catch (error) {

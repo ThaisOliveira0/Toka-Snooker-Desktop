@@ -42,7 +42,6 @@ onMounted(async () => {
   try {
     const response = await tabsService.getAllComandas(); 
     comandas.value = response || []; 
-    console.log("Comandas recebidas:", comandas.value);
   } catch (err) {
     console.error("Erro ao buscar comandas:", err);
   }

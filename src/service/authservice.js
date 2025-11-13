@@ -2,11 +2,16 @@ import axios from 'axios';
 import jwt_decode from 'jwt-decode';
 import { useToast } from "vue-toastification";
 
-const API_URL = 'http://localhost:3000';
+const api = axios.create({
+  baseURL: process.env.VUE_APP_BASE_URL,
+  headers: {
+    "x-api-key": process.env.VUE_APP_API_KEY, 
+  },
+});
 
 export async function login(email, senha) {
   try {
-    const response = await axios.post(`${API_URL}/login`, { email, senha });
+    const response = await api.post("/login", { email, senha });
 
     if (response.data.token) {
       const token = response.data.token;
@@ -26,7 +31,7 @@ export async function login(email, senha) {
 
 export async function register(nome, email, telefone, senha, tipo_usuario) {
   try {
-    const response = await axios.post(`${API_URL}/usuarios`, {
+    const response = await api.post("/usuarios", {
       nome,
       email,
       telefone,
@@ -59,14 +64,20 @@ export function logout() {
   sessionStorage.removeItem('token');
 }
 
+export function globalLogout() {
+  logout();
+  window.dispatchEvent(new Event('login-status-changed'));
+  window.location.href = '/';
+}
+
 export async function sendCode(email) {
-  const response = await axios.post(`${API_URL}/login/recuperacao`, { email })
-  return response.data
+  const response = await api.post("/login/recuperacao", { email });
+  return response.data;
 }
 
 export async function verifyCode(email, codigo) {
-  const response = await axios.post(`${API_URL}/login/verificar-codigo`, { email, codigo })
-  return response.data
+  const response = await api.post("/login/verificar-codigo", { email, codigo });
+  return response.data;
 }
 
 export async function resetPassword(id, senha) {
@@ -74,17 +85,11 @@ export async function resetPassword(id, senha) {
   return response.data
 }
 
-export function globalLogout() {
-  logout()
-  window.dispatchEvent(new Event('login-status-changed'))
-  window.location.href = '/'
-}
-
 
 export function startSessionTimer() {
   const toast = useToast();
 
-  const SESSION_LIMIT =  60* 60 * 1000
+  const SESSION_LIMIT = 60 * 60 * 1000; 
 
   function updateActivity() {
     sessionStorage.setItem('lastActivity', Date.now())
@@ -94,12 +99,12 @@ export function startSessionTimer() {
     const last = parseInt(sessionStorage.getItem('lastActivity') || '0')
     const now = Date.now()
 
-if (now - last > SESSION_LIMIT) {
-  toast.warning('Sua sessão expirou por inatividade.', {
-    timeout: 3000,
-    position: "top-right",
-    closeOnClick: true,
-    pauseOnHover: true,
+    if (now - last > SESSION_LIMIT) {
+      toast.warning('Sua sessão expirou por inatividade.', {
+        timeout: 3000,
+        position: "top-right",
+        closeOnClick: true,
+        pauseOnHover: true,
   })
   setTimeout(() => {
     globalLogout()

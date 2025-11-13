@@ -128,7 +128,6 @@ onMounted(() => {
 
   const data = JSON.parse(saved);
 
-  console.log("Música Pedido:", data)
   mesa.value = data.mesa || "Mesa desconhecida";
   pedido.value = (data.pedido || []).map(p => ({
     nome: p.nome || "Item desconhecido",

@@ -1,16 +1,13 @@
-
-const API_BASE_URL = "http://localhost:3000";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: process.env.VUE_APP_BASE_URL,
   headers: {
-    'x-api-key': 12345 
+    'x-api-key': process.env.VUE_APP_API_KEY 
   }
 });
 
 export default {
-
 
 async getAllComandas() {
     try {
@@ -22,6 +19,7 @@ async getAllComandas() {
       return { sucesso: false, mensagem: "Erro ao buscar comandas.", dados: [] };
     }
   },  
+
   async closeTab(id) {
     try {
       const response = await api.patch(`/comandas/${id}/fechar`);
@@ -31,6 +29,7 @@ async getAllComandas() {
       return { sucesso: false, mensagem: "Erro ao fechar a comanda:" };
     }
   },
+  
   async editTab(id,comanda) {
     try {
       const response = await api.put(`/comandas/${id}`);
