@@ -56,7 +56,7 @@
 <script setup>
 import { ref, nextTick } from "vue";
 import { useRouter } from "vue-router";
-import { verifyCode as verifyCodeAPI } from "@/service/authService.js";
+import { verifyCode as verifyCodeAPI } from "@/service/authservice.js";
 import "./EnterCode.css";
 
 const router = useRouter();

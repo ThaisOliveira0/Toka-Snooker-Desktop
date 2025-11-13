@@ -27,7 +27,7 @@
 <script setup>
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import { logout } from '@/service/authService'
+import { logout } from '@/service/authservice'
 
 const props = defineProps({
   tabs: Array

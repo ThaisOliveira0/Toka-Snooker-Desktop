@@ -48,7 +48,7 @@
 
 <script setup>
 import { ref } from "vue"
-import { register } from "@/service/authService.js"
+import { register } from "@/service/authservice.js"
 import { useRouter } from "vue-router"
 
 const router = useRouter()

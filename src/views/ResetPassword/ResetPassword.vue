@@ -58,7 +58,7 @@
 <script setup>
 import { ref } from "vue"
 import { useRouter } from "vue-router"
-import { resetPassword } from "@/service/authService.js"
+import { resetPassword } from "@/service/authservice.js"
 
 const router = useRouter()
 

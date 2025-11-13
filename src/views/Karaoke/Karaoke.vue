@@ -21,7 +21,6 @@
         </ul>
       </section>
 
-      <!-- Palco -->
       <section class="stage">
         <h2>O PALCO É SEU:</h2>
         <div class="stage-card">
@@ -38,25 +37,21 @@
 import { ref } from 'vue'
 import './Karaoke.css'
 
-// Referência pro container principal
 const karaokeRef = ref(null)
 const isFullscreen = ref(false)
 
-// Lista de espera
 const waitlist = [
   { table: '07', name: 'Mariana', song: 'Dancing Queen' },
   { table: '09', name: 'João', song: 'Blue Bird' },
   { table: '02', name: 'Carlos', song: 'Não Quero Dinheiro' },
 ]
 
-// Cantor atual
 const current = {
   table: '01',
   name: 'Marco',
   song: 'Evidências',
 }
 
-// Alterna o modo tela cheia
 const toggleFullscreen = async () => {
   if (!isFullscreen.value) {
     await karaokeRef.value.requestFullscreen()
@@ -65,7 +60,6 @@ const toggleFullscreen = async () => {
   }
 }
 
-// Atualiza flag quando o fullscreen muda
 document.addEventListener('fullscreenchange', () => {
   isFullscreen.value = !!document.fullscreenElement
 })

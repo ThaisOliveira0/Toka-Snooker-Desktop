@@ -145,7 +145,7 @@ import { ref, computed, onMounted } from "vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import ProductModal from "./Components/ProductModal.vue";
 import StockWithdrawal from "./Components/StockWithdrawal.vue";
-import "./inventoryControl.css";
+import "./InventoryControl.css";
 import inventoryService from "../../service/inventoryService";
 import { useToast } from 'vue-toastification'
 

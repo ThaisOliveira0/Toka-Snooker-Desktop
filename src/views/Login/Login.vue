@@ -41,9 +41,9 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { login } from '@/service/authService'
+import { login } from '@/service/authservice'
 import { useToast } from 'vue-toastification'
-import { getDecodedToken } from '@/service/authService.js'
+import { getDecodedToken } from '@/service/authservice.js'
 
 const decoded = getDecodedToken()
 const isAdmin = decoded?.role === 'admin' || decoded?.tipo_usuario === 'admin'

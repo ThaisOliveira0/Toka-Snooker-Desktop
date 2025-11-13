@@ -6,9 +6,9 @@
 <script setup>
 import Tabs from './components/Tabs.vue'
 import { computed } from 'vue'
-import { getDecodedToken } from './service/authService.js'
+import { getDecodedToken } from './service/authservice.js'
 import { onMounted } from 'vue'
-import { startSessionTimer } from './service/authService.js'
+import { startSessionTimer } from './service/authservice.js'
 
 onMounted(() => {
   startSessionTimer()

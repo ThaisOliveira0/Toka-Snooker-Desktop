@@ -99,4 +99,4 @@ function handleClose(comanda) {
 
 </script>
 
-<style src="./tabs.css"></style>
+<style src="./Tabs.css"></style>
