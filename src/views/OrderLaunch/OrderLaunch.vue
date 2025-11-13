@@ -120,7 +120,7 @@ import orderService from "../../service/ordersService.js";
 import productService from "../../service/productService.js";
 import NewProduct from "./Components/NewProduct.vue";
 import "./orderLaunch.css";
-import { getDecodedToken } from "../../service/authService.js";
+import { getDecodedToken } from "../../service/authservice.js";
 
 const decoded = getDecodedToken();
 const isAdmin = decoded?.role === "admin";

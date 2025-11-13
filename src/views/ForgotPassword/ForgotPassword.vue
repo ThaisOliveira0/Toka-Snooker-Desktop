@@ -46,7 +46,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { sendCode } from "@/service/authService.js";
+import { sendCode } from "@/service/authservice.js";
 import { useToast } from "vue-toastification";
 
 const email = ref("");
