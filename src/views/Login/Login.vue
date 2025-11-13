@@ -18,21 +18,21 @@
           <input type="email" placeholder="E-mail" v-model="email" />
           <input type="password" placeholder="Senha" v-model="senha" />
 
-
           <button type="submit" class="auth-button" @click.stop="handleLogin">
             Entrar
           </button>
 
           <a href="/esqueci-senha" class="forgot-password">Esqueci minha senha</a>
 
-          <p class="signup-text">
-            Novo por aqui? <router-link to="/cadastro">Cadastre-se!</router-link>
+          <p class="signUp-text" v-if="isAdmin">
+            <span>Não tem uma conta?</span>
+            <router-link  to="/cadastro">
+              Cadastre-se
+            </router-link>
           </p>
 
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
         </form>
-
-
       </div>
     </div>
   </div>
@@ -43,7 +43,10 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '@/service/authService'
 import { useToast } from 'vue-toastification'
+import { getDecodedToken } from '@/service/authService.js'
 
+const decoded = getDecodedToken()
+const isAdmin = decoded?.role === 'admin' || decoded?.tipo_usuario === 'admin'
 const email = ref('')
 const senha = ref('')
 const errorMessage = ref('')

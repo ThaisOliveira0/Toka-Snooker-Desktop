@@ -34,7 +34,8 @@ const routes = [
   {
     path: '/cadastro',
     name: 'Register',
-    component: Register
+    component: Register,
+    meta: { roles: ['admin'] }
   },
   {
     path: '/esqueci-senha',

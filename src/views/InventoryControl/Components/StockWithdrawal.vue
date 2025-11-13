@@ -1,5 +1,5 @@
 <template>
-  <div v-show="show" class="modal-overlay">
+  <div v-show="show" class="modal-overlay" @click.self="$emit('close')">
     <div class="modal">
       <header class="modal-header">
         <h3>Retirada de Itens do Estoque</h3>
