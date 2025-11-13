@@ -119,7 +119,7 @@ import { useToast } from "vue-toastification";
 import orderService from "../../service/ordersService.js";
 import productService from "../../service/productService.js";
 import NewProduct from "./Components/NewProduct.vue";
-import "./OrderLaunch.css";
+import "./Orderlaunch.css";
 import { getDecodedToken } from "../../service/authservice.js";
 
 const decoded = getDecodedToken();
