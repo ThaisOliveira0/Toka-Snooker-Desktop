@@ -3,14 +3,19 @@
     <main class="payment-content">
       <section class="payment-info">
         <div class="header-card">
-          <h2>{{ mesa }}</h2>
+          <h2>Mesa {{ mesa }}</h2>
           <p class="subtitle">Resumo do consumo</p>
         </div>
 
         <div class="payment-section">
           <div class="section-header">
             <h3>Pedidos</h3>
+
+            <button class="edit-btn-payment" @click="editingPedidos = !editingPedidos">
+              <i class="fas fa-edit"></i>
+            </button>
           </div>
+
           <table class="styled-table">
             <thead>
               <tr>
@@ -21,21 +26,31 @@
             </thead>
             <tbody>
               <tr v-for="(p, i) in pedido" :key="i">
-                <td>{{ p.nome || 'Item desconhecido' }}</td>
-                <td>{{ p.quantidade }}</td>
+                <td>{{ p.nome }}</td>
+
+                <td v-if="!editingPedidos">{{ p.quantidade }}</td>
+                <td v-else>
+                  <input type="number" v-model.number="p.quantidade" min="0"
+                    @change="() => { handleQuantityChange(p, pedido); saveChanges(); }" />
+
+                </td>
                 <td>R$ {{ (p.valor_total * p.quantidade).toFixed(2) }}</td>
-              </tr>
-              <tr v-if="!pedido || pedido.length === 0">
-                <td colspan="3">Nenhum pedido registrado.</td>
+
               </tr>
             </tbody>
           </table>
         </div>
 
+
         <div class="payment-section">
           <div class="section-header">
             <h3>Karaokê</h3>
+
+            <button class="edit-btn-payment" @click="editingKaraoke = !editingKaraoke">
+              <i class="fas fa-edit"></i>
+            </button>
           </div>
+
           <table class="styled-table">
             <thead>
               <tr>
@@ -46,12 +61,18 @@
             </thead>
             <tbody>
               <tr v-for="(m, i) in musica_pedido" :key="i">
-                <td>{{ m.nome || 'Música desconhecida' }}</td>
-                <td>{{ m.quantidade }}</td>
+
+                <td>{{ m.nome }}</td>
+
+                <td v-if="!editingKaraoke">{{ m.quantidade }}</td>
+                <td v-else>
+                  <input type="number" v-model.number="m.quantidade" min="0"
+                    @change="() => { handleQuantityChange(m, musica_pedido); saveChanges(); }" />
+
+
+                </td>
                 <td>R$ {{ (m.valor_total * m.quantidade).toFixed(2) }}</td>
-              </tr>
-              <tr v-if="!musica_pedido || musica_pedido.length === 0">
-                <td colspan="3">Nenhuma música solicitada.</td>
+
               </tr>
             </tbody>
           </table>
@@ -82,12 +103,7 @@
 
             <div v-if="showSplit" class="split-modal">
               <label for="people">Quantidade de pessoas:</label>
-              <input
-                id="people"
-                type="number"
-                v-model.number="peopleCount"
-                min="1"
-              />
+              <input id="people" type="number" v-model.number="peopleCount" min="1" />
               <p>
                 Valor por pessoa:
                 <strong>R$ {{ splitAmount.toFixed(2) }}</strong>
@@ -111,10 +127,13 @@ import { ref, computed, onMounted } from "vue";
 import tabService from "../../service/tabsService";
 import { useRouter } from "vue-router";
 import "./Payment.css";
+import { useToast } from "vue-toastification";
 
+const toast = useToast();
 const router = useRouter();
-
 const mesa = ref("");
+const editingPedidos = ref(false)
+const editingKaraoke = ref(false)
 const pedido = ref([]);
 const musica_pedido = ref([]);
 
@@ -128,8 +147,9 @@ onMounted(() => {
 
   const data = JSON.parse(saved);
 
-  mesa.value = data.mesa || "Mesa desconhecida";
+  mesa.value = Number(data.mesa.replace(/\D/g, "")) || null;
   pedido.value = (data.pedido || []).map(p => ({
+    id_produto: p.id_produto,
     nome: p.nome || "Item desconhecido",
     quantidade: Number(p.quantidade) || 1,
     valor_total: Number(p.valor_total) || 0
@@ -163,6 +183,58 @@ const splitAmount = computed(() =>
 );
 
 const toggleSplit = () => (showSplit.value = !showSplit.value);
+const handleQuantityChange = (item, list) => {
+  if (item.quantidade < 0) {
+    item.quantidade = 1;
+
+    toast.error("Digite um valor válido! A quantidade não pode ser negativa.", {
+      timeout: 2500,
+    });
+
+    return;
+  }
+
+  if (item.quantidade === 0) {
+    const confirmRemove = confirm("Deseja realmente remover este item da comanda?");
+
+    if (confirmRemove) {
+      const index = list.indexOf(item);
+      if (index !== -1) list.splice(index, 1);
+    } else {
+      item.quantidade = 1;
+    }
+  }
+};
+
+const saveChanges = async () => {
+  const saved = sessionStorage.getItem("selectedOrder");
+  if (!saved) return;
+
+  const data = JSON.parse(saved);
+  const idComanda = data.id;
+
+  if (!idComanda) return;
+
+  const novaComanda = {
+    mesa: mesa.value,
+    pedido: pedido.value,
+    musica_pedido: musica_pedido.value
+  };
+
+  try {
+    const response = await tabService.editTab(idComanda, novaComanda);
+
+    if (response.sucesso) {
+      toast.success("Alterações salvas com sucesso!", { timeout: 2000 });
+    } else {
+      toast.error("Erro ao salvar alterações.");
+    }
+
+  } catch (err) {
+    toast.error("Erro inesperado ao salvar.");
+    console.error(err);
+  }
+};
 
 const makePayment = async () => {
   try {

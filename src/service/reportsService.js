@@ -1,15 +1,16 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
-    'x-api-key': process.env.VUE_APP_API_KEY 
-  }
+    "x-api-key": import.meta.env.VITE_API_KEY,
+  },
+
 });
 
 export default {
   async getReports(startDate, endDate) {
-    
+
     try {
       const response = await api.get("/relatorio/pedidos", {
         params: {
@@ -17,7 +18,7 @@ export default {
           dataFim: endDate,
         },
       });
-      
+
       return response.data;
     } catch (error) {
       console.error("Erro ao buscar relatório:", error);

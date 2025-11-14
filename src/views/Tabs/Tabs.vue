@@ -53,14 +53,16 @@ const orders = computed(() =>
     mesa: `Mesa ${String(comanda.mesa ?? '??').padStart(2, "0")}`,
     pedido: (comanda.pedido || []).flatMap(p =>
       (p.itens || []).map(item => ({
+        id_produto: item.id_produto, 
         nome: item.nome ?? "Item desconhecido",
         quantidade: Number(item.quantidade) || 1,
-        valor_total: Number(item.valor_unit) || 3,
+        valor_total: Number(item.valor_unit) || 0,
         status: p.status,
         observacao: p.observacao
       }))
     ),
     musica_pedido: (comanda.musica_pedido || []).map(m => ({
+      id_musica: m.id_musica, 
       nome: m.nome ?? "Música desconhecida",
       quantidade: Number(m.qtde_pedidos) || 1,
       valor_total: Number(m.valor) || 0
@@ -77,11 +79,11 @@ const filteredOrders = computed(() => {
 });
 
 function handleClose(comanda) {
-  
   const safeComanda = {
     id: comanda.id ,
     mesa: comanda.mesa || "Mesa desconhecida",
     pedido: (comanda.pedido || []).map(p => ({
+      id_produto: p.id_produto,
       nome: p.nome || "Item desconhecido",
       quantidade: Number(p.quantidade) || 1,
       valor_total: Number(p.valor_total ?? p.valor_unit ?? 0)
@@ -92,6 +94,7 @@ function handleClose(comanda) {
       valor_total: Number(m.valor_total ?? m.valor ?? 3)
     }))
   };
+console.log("safeComanda", safeComanda);
 
   sessionStorage.setItem("selectedOrder", JSON.stringify(safeComanda));
   router.push({ name: "Payment" });

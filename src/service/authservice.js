@@ -3,9 +3,9 @@ import jwt_decode from 'jwt-decode';
 import { useToast } from "vue-toastification";
 
 const api = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
-    "x-api-key": process.env.VUE_APP_API_KEY, 
+    "x-api-key": import.meta.env.VITE_API_KEY,
   },
 });
 
@@ -89,7 +89,7 @@ export async function resetPassword(id, senha) {
 export function startSessionTimer() {
   const toast = useToast();
 
-  const SESSION_LIMIT = 60 * 60 * 1000; 
+  const SESSION_LIMIT = 60 * 60 * 1000;
 
   function updateActivity() {
     sessionStorage.setItem('lastActivity', Date.now())
@@ -105,11 +105,11 @@ export function startSessionTimer() {
         position: "top-right",
         closeOnClick: true,
         pauseOnHover: true,
-  })
-  setTimeout(() => {
-    globalLogout()
-  }, 3000) 
-}
+      })
+      setTimeout(() => {
+        globalLogout()
+      }, 3000)
+    }
   }
 
   window.addEventListener('mousemove', updateActivity)

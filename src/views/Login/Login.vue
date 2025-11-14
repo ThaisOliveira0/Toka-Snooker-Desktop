@@ -64,11 +64,12 @@ async function handleLogin() {
   try {
     const { token, role } = await login(email.value, senha.value)
 
-    if (token) {
-      toast.success('Login realizado com sucesso!', { position: 'top-right' })
-      window.dispatchEvent(new Event('login-status-changed'))
-      router.push('/')
-    }
+if (token) {
+  sessionStorage.setItem("token", token)
+  toast.success('Login realizado com sucesso!', { position: 'top-right' })
+  window.location.href = '/'
+}
+
   } catch (error) {
     console.error('Erro no login:', error)
 

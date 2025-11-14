@@ -35,6 +35,8 @@ const props = defineProps({
 
 const router = useRouter()
 const route = useRoute()
+const loginState = ref(Date.now())
+
 
 const selectedTab = ref(route.path)
 const isLoggedIn = ref(false)
@@ -79,7 +81,7 @@ function logoutUser() {
   showDropdown.value = false
   isLoggedIn.value = false
   window.dispatchEvent(new Event('login-status-changed'))
-  router.push('/')
+  window.location.href = '/'
 }
 
 function login() {
@@ -95,14 +97,20 @@ function selectTab(tab) {
 
 onMounted(() => {
   checkLogin()
-  window.addEventListener('login-status-changed', checkLogin)
-  document.addEventListener('click', handleClickOutside)
+  window.addEventListener('login-status-changed', updateTabs)
 })
 
+
 onUnmounted(() => {
-  window.removeEventListener('login-status-changed', checkLogin)
-  document.removeEventListener('click', handleClickOutside)
+  window.removeEventListener('login-status-changed', updateTabs)
 })
+
+function updateTabs() {
+  loginState.value = Date.now()
+  checkLogin()
+}
+
+
 </script>
 
 <style scoped>

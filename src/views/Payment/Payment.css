@@ -186,3 +186,35 @@
     flex-direction: column;
   }
 }
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+
+.edit-btn-payment {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 1.1rem;
+  color: #2e7d32;
+}
+
+
+.edit-btn:hover {
+  color: #000;
+  transform: scale(1.1);
+}
+
+.styled-table input {
+  width: 90%;
+  padding: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}

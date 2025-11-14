@@ -1,15 +1,16 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
-    'x-api-key': process.env.VUE_APP_API_KEY 
-  }
+    "x-api-key": import.meta.env.VITE_API_KEY,
+  },
+
 });
 
 export default {
-  
-  async createPedido(pedido) { 
+
+  async createPedido(pedido) {
     try {
       const response = await api.post("/pedidos", pedido);
       return response;
@@ -19,7 +20,7 @@ export default {
     }
   },
 
-  async getAllPedidos() { 
+  async getAllPedidos() {
     try {
       const response = await api.get("/pedidos");
       return response.data;

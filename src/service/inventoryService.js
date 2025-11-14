@@ -1,10 +1,11 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.VUE_APP_BASE_URL,
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
-    "x-api-key": process.env.VUE_APP_API_KEY,
+    "x-api-key": import.meta.env.VITE_API_KEY,
   },
+
 });
 
 export default {
@@ -18,7 +19,7 @@ export default {
     }
   },
 
-  async createItem(item) {   
+  async createItem(item) {
     try {
       const response = await api.post("/ingredientes", item);
       return response.data;
@@ -36,14 +37,14 @@ export default {
     }
   },
 
-async patchItem(items) {
-  try {
-    const response = await api.patch(`/ingredientes`, items);
-    return response.data;
-  } catch (error) {
-    console.error("Erro ao aplicar patch no ingrediente:", error);
-  }
-},
+  async patchItem(items) {
+    try {
+      const response = await api.patch(`/ingredientes`, items);
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao aplicar patch no ingrediente:", error);
+    }
+  },
 
 
   async deleteItem(id) {
