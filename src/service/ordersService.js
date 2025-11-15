@@ -5,7 +5,7 @@ const api = axios.create({
   headers: {
     "x-api-key": import.meta.env.VITE_API_KEY,
   },
-
+  
 });
 
 export default {
@@ -39,4 +39,19 @@ export default {
       return { sucesso: false, mensagem: "Erro ao atualizar status do pedido." };
     }
   },
+
+async updateOrderItem(pedidoId, itemId, quantidade) {
+  
+  try {
+    const response = await api.put(
+      `/item-pedido/pedido/${pedidoId}/item-id/${itemId}`,
+      { quantidade }
+    );
+    
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao atualizar item do pedido:", error);
+    return { sucesso: false, mensagem: "Erro ao atualizar item do pedido." };
+  }
+}
 };

@@ -20,7 +20,7 @@
           <label for="role">Tipo de usuário:</label>
           <select id="role" v-model="tipo_usuario">
             <option value="funcionario">Funcionário</option>
-            <option value="admin">Administrador</option>
+            <option value="ADMIN">Administrador</option>
           </select>
 
           <button class="register-button" type="submit" :disabled="loading">

@@ -14,16 +14,21 @@
       </div>
     </header>
 
-    <div class="carousel-wrap">
-      <div class="cards-container" ref="cardsContainer">
-        <TableCard
-          v-for="(order, idx) in filteredOrders"
-          :key="order.table + idx"
-          :data="order"
-          @close="handleClose"
-        />
-      </div>
-    </div>
+<div v-if="loading" class="loading">
+  <div class="spinner"></div>
+</div>
+
+<div v-else class="carousel-wrap">
+  <div class="cards-container" ref="cardsContainer">
+    <TableCard
+      v-for="(order, idx) in filteredOrders"
+      :key="order.table + idx"
+      :data="order"
+      @close="handleClose"
+    />
+  </div>
+</div>
+
   </div>
 </template>
 
@@ -35,6 +40,7 @@ import tabsService from "../../service/tabsService";
 
 const comandas = ref([]);
 const search = ref("");
+const loading = ref(true);
 const router = useRouter();
 const cardsContainer = ref(null);
 
@@ -44,6 +50,8 @@ onMounted(async () => {
     comandas.value = response || []; 
   } catch (err) {
     console.error("Erro ao buscar comandas:", err);
+  } finally {
+    loading.value = false; 
   }
 });
 
@@ -94,7 +102,6 @@ function handleClose(comanda) {
       valor_total: Number(m.valor_total ?? m.valor ?? 3)
     }))
   };
-console.log("safeComanda", safeComanda);
 
   sessionStorage.setItem("selectedOrder", JSON.stringify(safeComanda));
   router.push({ name: "Payment" });

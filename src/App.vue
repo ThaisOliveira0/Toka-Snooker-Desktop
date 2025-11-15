@@ -17,13 +17,13 @@ onMounted(() => {
 
 const allTabs = [
   { name: 'Home', path: '/' },
-  { name: 'Comandas', path: '/comandas', roles: ['admin', 'funcionario'] },
-  { name: 'Pedidos', path: '/pedidos', roles: ['admin', 'funcionario'] },
-  { name: 'Karaokê', path: '/karaoke', roles: ['admin', 'funcionario'] },
-  { name: 'Relatórios', path: '/relatorios', roles: ['admin'] },
-  { name: 'Cadastro', path: '/cadastro', roles: ['admin'] },
-  { name: 'Estoque', path: '/estoque', roles: ['admin', 'funcionario'] },
-  { name: 'Cozinha', path: '/cozinha', roles: ['admin', 'funcionario'] },
+  { name: 'Comandas', path: '/comandas', roles: ['ADMIN', 'funcionario'] },
+  { name: 'Pedidos', path: '/pedidos', roles: ['ADMIN', 'funcionario'] },
+  { name: 'Karaokê', path: '/karaoke', roles: ['ADMIN', 'funcionario'] },
+  { name: 'Relatórios', path: '/relatorios', roles: ['ADMIN'] },
+  { name: 'Cadastro', path: '/cadastro', roles: ['ADMIN'] },
+  { name: 'Estoque', path: '/estoque', roles: ['ADMIN', 'funcionario'] },
+  { name: 'Cozinha', path: '/cozinha', roles: ['ADMIN', 'funcionario'] },
 ]
 
 const decoded = getDecodedToken()

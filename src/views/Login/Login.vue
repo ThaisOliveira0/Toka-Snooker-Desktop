@@ -16,7 +16,11 @@
           </div>
 
           <input type="email" placeholder="E-mail" v-model="email" />
-          <input type="password" placeholder="Senha" v-model="senha" />
+          <div class="password-wrapper">
+            <input :type="showPassword ? 'text' : 'password'" placeholder="Senha" v-model="senha" />
+            <i class="fas" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'" @click="togglePassword"></i>
+          </div>
+
 
           <button type="submit" class="auth-button" @click.stop="handleLogin">
             Entrar
@@ -24,9 +28,9 @@
 
           <a href="/esqueci-senha" class="forgot-password">Esqueci minha senha</a>
 
-          <p class="signUp-text" v-if="isAdmin">
+          <p class="signup-text" v-if="isAdmin">
             <span>Não tem uma conta?</span>
-            <router-link  to="/cadastro">
+            <router-link to="/cadastro">
               Cadastre-se
             </router-link>
           </p>
@@ -46,15 +50,21 @@ import { useToast } from 'vue-toastification'
 import { getDecodedToken } from '@/service/authservice.js'
 
 const decoded = getDecodedToken()
-const isAdmin = decoded?.role === 'admin' || decoded?.tipo_usuario === 'admin'
+const isAdmin = decoded?.role === 'ADMIN' || decoded?.tipo_usuario === 'ADMIN'
 const email = ref('')
 const senha = ref('')
 const errorMessage = ref('')
 const router = useRouter()
 const toast = useToast()
+const showPassword = ref(false)
+
+function togglePassword() {
+  showPassword.value = !showPassword.value
+}
 
 async function handleLogin() {
-  errorMessage.value = '' 
+
+  errorMessage.value = ''
 
   if (!email.value || !senha.value) {
     toast.warning('Por favor, preencha todos os campos.', { position: 'top-right' })
@@ -62,13 +72,13 @@ async function handleLogin() {
   }
 
   try {
-    const { token, role } = await login(email.value, senha.value)
-
-if (token) {
-  sessionStorage.setItem("token", token)
-  toast.success('Login realizado com sucesso!', { position: 'top-right' })
-  window.location.href = '/'
-}
+    const { token } = await login(email.value, senha.value)
+    
+    if (token) {
+      sessionStorage.setItem("token", token)
+      toast.success('Login realizado com sucesso!', { position: 'top-right' })
+      window.location.href = '/'
+    }
 
   } catch (error) {
     console.error('Erro no login:', error)

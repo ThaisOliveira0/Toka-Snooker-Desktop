@@ -24,7 +24,7 @@ const routes = [
     path: '/relatorios',
     name: 'AdmReport',
     component: AdmReport,
-    meta: { roles: ['admin'] } 
+    meta: { roles: ['ADMIN'] } 
   },
   {
     path: '/login',
@@ -35,7 +35,7 @@ const routes = [
     path: '/cadastro',
     name: 'Register',
     component: Register,
-    meta: { roles: ['admin'] }
+    meta: { roles: ['ADMIN'] }
   },
   {
     path: '/esqueci-senha',
@@ -51,43 +51,43 @@ const routes = [
     path: '/comandas',
     name: 'Tabs',
     component: Tabs,
-    meta: { roles: ['admin', 'funcionario'] }
+    meta: { roles: ['ADMIN', 'funcionario'] }
   },
   {
     path: '/karaoke',
     name: 'Karaoke',
     component: Karaoke,
-    meta: { roles: ['funcionario','admin'] }
+    meta: { roles: ['funcionario','ADMIN'] }
   },
   {
     path: '/pedidos',
     name: 'OrderLaunch',
     component: OrderLaunch,
-    meta: { roles: ['admin', 'funcionario'] }
+    meta: { roles: ['ADMIN', 'funcionario'] }
   },
   {
     path: '/estoque',
     name: 'InventoryControl',
     component: InventoryControl,
-    meta: { roles: ['admin'] }
+    meta: { roles: ['ADMIN'] }
   },
   {
     path: '/pagamento',
     name: 'Payment',
     component: Payment,
-    meta: { roles: ['admin'] }
+    meta: { roles: ['ADMIN'] }
   },
   {
     path: '/inserir-codigo',
     name: 'EnterCode',
     component: EnterCode,
-    meta: { roles: ['admin'] }
+    meta: { roles: ['ADMIN'] }
   },
   {
     path: '/cozinha',
     name: 'KitchenOrders',
     component: KitchenOrders,
-    meta: { roles: ['admin'] }
+    meta: { roles: ['ADMIN'] }
   },
 ]
 

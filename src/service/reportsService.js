@@ -9,7 +9,7 @@ const api = axios.create({
 });
 
 export default {
-  async getReports(startDate, endDate) {
+  async getReportsOrder(startDate, endDate) {
 
     try {
       const response = await api.get("/relatorio/pedidos", {
@@ -25,4 +25,33 @@ export default {
       return null;
     }
   },
+
+  async getReportsMusic(startDate, endDate) {
+
+    try {
+      const response = await api.get("/relatorio/musicas", {
+        params: {
+          dataInicio: startDate,
+          dataFim: endDate,
+        },
+      });
+
+      return response.data;
+    } catch (error) {
+      console.error("Erro ao buscar relatório:", error);
+      return null;
+    }
+  },
+
+async getGraphInfo(year, month) {
+  try {
+    const response = await api.get(`/relatorio/pedidos/ano/${year}/mes/${month}`);
+
+    return response.data;
+  } catch (error) {
+    console.error("Erro ao buscar relatório:", error);
+    return null;
+  }
+}
+
 };
