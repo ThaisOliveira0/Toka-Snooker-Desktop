@@ -2,76 +2,80 @@
   <div class="order-launch">
     <header class="order-header">
       <h4>Lançamento de Pedido</h4>
-      <button v-if="isAdmin" class="new-product-btn" @click="openNewProductModal">
+ <button v-if="isAdmin" class="new-product-btn" @click="openNewProductModal">
         + Novo Produto
       </button>
 
     </header>
 
-<section class="order-info">
-  <div class="order-row">
+    <section class="order-info">
+      <div class="order-row">
 
-    <div class="order-field">
-      <label for="table-number">Mesa:</label>
-      <input id="table-number" type="number" v-model="tableNumber" placeholder="Número da mesa" />
-    </div>
+        <div class="order-field">
+          <label for="table-number">Mesa:</label>
+          <input id="table-number" type="number" v-model="tableNumber" placeholder="Número da mesa" />
+        </div>
 
-    <div class="order-field order-id-field">
-      <div class="order-id-label-row">
-        <label for="order-id">ID da Comanda:</label>
-        <!-- <button 
+        <div class="order-field order-id-field">
+          <div class="order-id-label-row">
+            <label for="order-id">ID da Comanda:</label>
+            <!-- <button 
         :class="['new-order-btn', { active: novaComanda }]" 
         @click="novaComanda = !novaComanda"
         >
         Criar nova comanda
       </button> -->
-    </div>
-    <input
-    id="order-id"
-    type="number"
-    v-model="comandaId"
-    :disabled="novaComanda"
-    placeholder="Digite o ID"
-    />
-  </div>
-  <div class="order-field">
-    <label for="observacao">Observação:</label>
-    <input id="observacao" type="text" v-model="observacao" placeholder="Ex: sem molho, bem passado..." />
-  </div>
+          </div>
+          <input
+            id="order-id"
+            type="number"
+            v-model="comandaId"
+            :disabled="novaComanda"
+            placeholder="Digite o ID"
+          />
+        </div>
+        <div class="order-field">
+          <label for="observacao">Observação:</label>
+          <input id="observacao" type="text" v-model="observacao" placeholder="Ex: sem molho, bem passado..." />
+        </div>
 
-  </div>
-</section>
+      </div>
+    </section>
 
 
     <main class="order-content">
       <section class="order-products">
-        <div class="order-tabs">
-          <button v-for="tab in tabs" :key="tab" :class="{ active: tab === activeTab }" @click="activeTab = tab">
-            {{ tab }}
-          </button>
+        <div v-if="loading" class="loading-container">
+          <div class="spinner"></div>
         </div>
-
-        <div class="order-items">
-          <div v-for="item in filteredItems" :key="item.id" class="order-item-card">
-            <div class="item-info">
-              <h3>{{ item.name }}</h3>
-            </div>
-
-            <div class="item-actions">
-              <div class="item-price">
-                <span>R$ {{ item.price.toFixed(2) }}</span>
-              </div>
-
-              <div class="item-quantity">
-                <button @click="decreaseItem(item)">−</button>
-                <span>{{ item.quantity }}</span>
-                <button @click="addItem(item)">+</button>
-              </div>
-            </div>
-            <button v-if="isAdmin" class="edit-btn" @click="openEditProductModal(item)" title="Editar produto">
-             <i class="fas fa-edit"></i>
+        <div v-else>
+          <div class="order-tabs">
+            <button v-for="tab in tabs" :key="tab" :class="{ active: tab === activeTab }" @click="activeTab = tab">
+              {{ tab }}
             </button>
+          </div>
 
+          <div class="order-items">
+              <div v-for="item in filteredItems" :key="item.id" class="order-item-card">
+              <div class="item-info">
+                <h3>{{ item.name }}</h3>
+              </div>
+
+              <div class="item-actions">
+                <div class="item-price">
+                  <span>R$ {{ item.price.toFixed(2) }}</span>
+                </div>
+
+                <div class="item-quantity">
+                  <button @click="decreaseItem(item)">−</button>
+                  <span>{{ item.quantity }}</span>
+                  <button @click="addItem(item)">+</button>
+                </div>
+              </div>
+                <button v-if="isAdmin" class="edit-btn" @click="openEditProductModal(item)" title="Editar produto">
+                <i class="fas fa-edit"></i>
+              </button>
+            </div>
           </div>
         </div>
       </section>
@@ -101,16 +105,20 @@
           <strong>Total:</strong> R$ {{ cartTotal.toFixed(2) }}
         </div>
 
-        <button v-if="cart.length > 0" class="confirm-btn" @click="confirmOrder">
+       <button v-if="cart.length > 0" class="confirm-btn" @click="confirmOrder">
           Confirmar Pedido
         </button>
       </aside>
     </main>
   </div>
-  <NewProduct :show="showNewProductModal" :form="newProductForm" :editingItem="editingItem"
-    @close="closeNewProductModal" @save="saveNewProduct" @delete="deleteProduto" />
-
-
+  <NewProduct
+    :show="showNewProductModal"
+    :form="newProductForm"
+    :editingItem="editingItem"
+    @close="closeNewProductModal"
+    @save="saveNewProduct"
+    @delete="deleteProduto"
+  />
 </template>
 
 <script setup>
@@ -125,7 +133,7 @@ import { getDecodedToken } from "../../service/authservice.js";
 const decoded = getDecodedToken();
 const isAdmin = decoded?.role === "admin";
 const toast = useToast();
-
+const loading = ref(true);
 const tableNumber = ref("");
 const comandaId = ref("");
 const novaComanda = ref(false);
@@ -143,7 +151,7 @@ const newProductForm = ref({
 });
 
 const openNewProductModal = () => {
-  newProductForm.value = { nome: "", categoria: "", preco: 0, estoque: 0, qtde_min: 0 };
+newProductForm.value = { nome: "", categoria: "", preco: 0, estoque: 0, qtde_min: 0 };
   showNewProductModal.value = true;
 };
 const editingItem = ref(null);
@@ -180,14 +188,17 @@ const saveNewProduct = async (product) => {
     if (editingItem.value) {
       await productService.updateProduto(editingItem.value.id, payload);
       toast.success("Produto atualizado com sucesso!");
-      const index = items.value.findIndex(i => i.id === editingItem.value.id);
+      const index = items.value.findIndex((i) => i.id === editingItem.value.id);
       if (index !== -1) {
         items.value[index] = {
           ...items.value[index],
           name: payload.nome,
           subtitle: payload.descricao,
-          price: payload.preco_promo && payload.preco_promo < payload.preco ? payload.preco_promo : payload.preco,
-          category: payload.categoria
+          price:
+            payload.preco_promo && payload.preco_promo < payload.preco
+              ? payload.preco_promo
+              : payload.preco,
+          category: payload.categoria,
         };
       }
     } else {
@@ -198,8 +209,8 @@ const saveNewProduct = async (product) => {
       const produtos = response.data || response;
 
       items.value = produtos.map((p) => {
-
-        const temPromo = p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco;
+        const temPromo =
+          p.preco_promo && p.preco_promo > 0 && p.preco_promo < p.preco;
         return {
           id: p.id,
           category: p.categoria,
@@ -220,7 +231,6 @@ const saveNewProduct = async (product) => {
     toast.error("Não foi possível salvar o produto.");
   }
 };
-
 
 const tabs = computed(() => {
   const categorias = [...new Set(items.value.map((i) => i.category))];
@@ -244,11 +254,12 @@ onMounted(async () => {
       };
     });
 
-
     if (items.value.length > 0) activeTab.value = items.value[0].category;
   } catch (error) {
     console.error("Erro ao carregar produtos:", error);
     toast.error("Não foi possível carregar os produtos.");
+  } finally {
+    loading.value = false;
   }
 });
 
@@ -300,6 +311,7 @@ const confirmOrder = async () => {
     if (response.data.sucesso === true) {
       toast.success(response.data.mensagem || "Pedido criado com sucesso!");
       comandaId.value = "";
+      tableNumber.value = "";
       observacao.value = "";
       novaComanda.value = false;
       items.value.forEach((i) => (i.quantity = 0));

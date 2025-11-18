@@ -3,9 +3,7 @@
     <header class="inventory-header">
       <h2>Controle de Estoque</h2>
       <div class="header-actions">
-           <button class="add-btn" @click="openModal()">
-          + Adicionar Item
-        </button>
+        <button class="add-btn" @click="openModal()">+ Adicionar Item</button>
         <button class="stockWithdrawal" @click="openWithdrawal()">
           Retirar Itens
         </button>
@@ -40,7 +38,20 @@
               </tr>
             </thead>
             <tbody>
+              <tr v-if="loading">
+                <td colspan="5" class="loading-row">
+                  <div class="spinner"></div>
+                </td>
+              </tr>
+
+              <tr v-else-if="filteredItems.length && !loading  === 0">
+                <td colspan="5" class="no-results">
+                  Nenhum produto encontrado
+                </td>
+              </tr>
+
               <tr
+                v-else
                 v-for="item in filteredItems"
                 :key="item.id"
                 :class="{
@@ -84,7 +95,7 @@
                 </td>
               </tr>
 
-              <tr v-if="filteredItems.length === 0">
+              <tr v-if="filteredItems.length === 0 && !loading">
                 <td colspan="5" class="no-results">
                   Nenhum produto encontrado
                 </td>
@@ -149,7 +160,7 @@ import "./InventoryControl.css";
 import inventoryService from "../../service/inventoryService";
 import { useToast } from 'vue-toastification'
 
-const toast = useToast()
+const toast = useToast();
 const searchQuery = ref("");
 const loading = ref(false);
 const saving = ref(false);
@@ -263,29 +274,29 @@ const saveItem = async (formData) => {
   };
 
   try {
-  if (editingItem.value) {
-     await inventoryService.updateItem(editingItem.value.id, payload);
+    if (editingItem.value) {
+      await inventoryService.updateItem(editingItem.value.id, payload);
       const index = items.value.findIndex((i) => i.id === editingItem.value.id);
       items.value[index] = { ...items.value[index], ...formData };
-    toast.success('Item atualizado com sucesso!')
-  } else {
-    const newItem = await inventoryService.createItem(payload);
-    items.value.push({
-      ...newItem,
-      preco: newItem.preco_unit,
-      estoque: newItem.qtde_estoque,
-      qtde_min: newItem.qtde_min,
-  });
-    toast.success('Item adicionado com sucesso!')
-  }
+      toast.success('Item atualizado com sucesso!')
+    } else {
+      const newItem = await inventoryService.createItem(payload);
+      items.value.push({
+        ...newItem,
+        preco: newItem.preco_unit,
+        estoque: newItem.qtde_estoque,
+        qtde_min: newItem.qtde_min,
+      });
+      toast.success('Item adicionado com sucesso!')
+    }
     await refreshInventory();
     closeModal();
-} catch (error) {
-  console.error("Erro ao salvar item:", error);
-  toast.error('Erro ao salvar o item. Tente novamente.')
-} finally {
-  saving.value = false;
-}
+  } catch (error) {
+    console.error("Erro ao salvar item:", error);
+    toast.error('Erro ao salvar o item. Tente novamente.')
+  } finally {
+    saving.value = false;
+  }
 };
 
 const requestDelete = (item) => {
@@ -298,13 +309,13 @@ const handleConfirmDelete = async () => {
   try {
     await inventoryService.deleteItem(itemToDelete.value.id);
     items.value = items.value.filter((i) => i.id !== itemToDelete.value.id);
-  toast.success('Item excluído com sucesso!')
-} catch (error) {
-   console.error("Erro ao excluir item:", error);
-  toast.error('Erro ao excluir o item. Tente novamente.')
-} finally {
+    toast.success('Item excluído com sucesso!')
+  } catch (error) {
+    console.error("Erro ao excluir item:", error);
+    toast.error('Erro ao excluir o item. Tente novamente.')
+  } finally {
     showConfirm.value = false;
     itemToDelete.value = null;
-}
+  }
 };
 </script>

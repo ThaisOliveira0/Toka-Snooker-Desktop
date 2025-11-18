@@ -123,7 +123,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import tabService from "../../service/tabsService";
 import { useRouter } from "vue-router";
 import "./Payment.css";
@@ -131,36 +131,13 @@ import { useToast } from "vue-toastification";
 
 const toast = useToast();
 const router = useRouter();
+
 const mesa = ref("");
-const editingPedidos = ref(false)
-const editingKaraoke = ref(false)
+const editingPedidos = ref(false);
+const editingKaraoke = ref(false);
 const pedido = ref([]);
 const musica_pedido = ref([]);
-
-onMounted(() => {
-  const saved = sessionStorage.getItem("selectedOrder");
-
-  if (!saved) {
-    router.push("/comandas");
-    return;
-  }
-
-  const data = JSON.parse(saved);
-
-  mesa.value = Number(data.mesa.replace(/\D/g, "")) || null;
-  pedido.value = (data.pedido || []).map(p => ({
-    id_produto: p.id_produto,
-    nome: p.nome || "Item desconhecido",
-    quantidade: Number(p.quantidade) || 1,
-    valor_total: Number(p.valor_total) || 0
-  }));
-
-  musica_pedido.value = (data.musica_pedido || []).map(m => ({
-    nome: m.nome || "Música desconhecida",
-    quantidade: Number(m.quantidade) || 1,
-    valor_total: Number(m.valor_total) || 0
-  }));
-});
+const remaining = ref(0);
 
 const total = computed(() => {
   const pedidosTotal = pedido.value.reduce(
@@ -174,15 +151,69 @@ const total = computed(() => {
   return pedidosTotal + musicaTotal;
 });
 
+watch(total, () => {
+  if (remaining.value < total.value) return;
+  remaining.value = total.value;
+});
+
+onMounted(() => {
+  const saved = sessionStorage.getItem("selectedOrder");
+  if (!saved) {
+    router.push("/comandas");
+    return;
+  }
+
+  const data = JSON.parse(saved);
+
+  mesa.value = Number(data.mesa.replace(/\D/g, "")) || null;
+
+  pedido.value = (data.pedido || []).map((p) => ({
+    id_produto: p.id_produto,
+    nome: p.nome || "Item desconhecido",
+    quantidade: Number(p.quantidade) || 1,
+    valor_total: Number(p.valor_total) || 0,
+  }));
+
+  musica_pedido.value = (data.musica_pedido || []).map((m) => ({
+    nome: m.nome || "Música desconhecida",
+    quantidade: Number(m.quantidade) || 1,
+    valor_total: Number(m.valor_total) || 0,
+  }));
+
+  remaining.value = total.value;
+});
+
+
 const showSplit = ref(false);
 const peopleCount = ref(1);
 const paymentMethod = ref("Cartão de Crédito");
 
-const splitAmount = computed(() =>
-  peopleCount.value > 0 ? total.value / peopleCount.value : total.value
-);
+const splitFixedAmount = ref(null);
 
-const toggleSplit = () => (showSplit.value = !showSplit.value);
+watch(peopleCount, () => {
+  if (showSplit.value && peopleCount.value > 0) {
+    splitFixedAmount.value = total.value / peopleCount.value;
+  }
+});
+
+
+const toggleSplit = () => {
+  showSplit.value = !showSplit.value;
+
+  if (!showSplit.value) {
+    splitFixedAmount.value = null; 
+  } else {
+    splitFixedAmount.value = total.value / peopleCount.value;
+  }
+};
+
+const splitAmount = computed(() => {
+  if (splitFixedAmount.value !== null) {
+    return splitFixedAmount.value;
+  }
+  return peopleCount.value > 0 ? total.value / peopleCount.value : total.value;
+});
+
 const handleQuantityChange = (item, list) => {
   if (item.quantidade < 0) {
     item.quantidade = 1;
@@ -218,7 +249,7 @@ const saveChanges = async () => {
   const novaComanda = {
     mesa: mesa.value,
     pedido: pedido.value,
-    musica_pedido: musica_pedido.value
+    musica_pedido: musica_pedido.value,
   };
 
   try {
@@ -229,7 +260,6 @@ const saveChanges = async () => {
     } else {
       toast.error("Erro ao salvar alterações.");
     }
-
   } catch (err) {
     toast.error("Erro inesperado ao salvar.");
     console.error(err);
@@ -238,40 +268,63 @@ const saveChanges = async () => {
 
 const makePayment = async () => {
   try {
-    const saved = sessionStorage.getItem("selectedOrder")
+    const saved = sessionStorage.getItem("selectedOrder");
     if (!saved) {
-      alert("Nenhuma comanda selecionada.")
-      return
+      toast.error("Nenhuma comanda selecionada.");
+      return;
     }
 
-    const data = JSON.parse(saved)
-    const idComanda = data.id
+    const data = JSON.parse(saved);
+    const idComanda = data.id;
 
     if (!idComanda) {
-      alert("ID da comanda não encontrado.")
-      return
+      toast.error("ID da comanda não encontrado.");
+      return;
     }
 
-    alert(`Pagamento de R$ ${total.value.toFixed(2)} efetuado com sucesso!`)
+    const amountToPay = showSplit.value
+      ? splitFixedAmount.value
+      : remaining.value;
 
-    const response = await tabService.closeTab(idComanda)
+    if (!amountToPay || amountToPay <= 0) {
+      toast.info("Nada a pagar!");
+      return;
+    }
+
+    toast.success(`Pagamento de R$ ${amountToPay.toFixed(2)} efetuado com sucesso!`, {
+      timeout: 2500
+    });
+
+    remaining.value -= amountToPay;
+
+    if (remaining.value > 0) {
+      toast.info(
+        `Restam R$ ${remaining.value.toFixed(2)} para quitar a comanda.`,
+        { timeout: 3000 }
+      );
+      return;
+    }
+
+    const response = await tabService.closeTab(idComanda);
 
     if (response.sucesso === false) {
-      alert("Erro ao fechar comanda.")
-      console.error(response.mensagem)
-      return
+      toast.error("Erro ao fechar comanda.");
+      console.error(response.mensagem);
+      return;
     }
 
-    alert("Comanda fechada com sucesso!")
+    toast.success("Comanda fechada com sucesso!", {
+      timeout: 3000
+    });
 
-    sessionStorage.removeItem("selectedOrder")
-    router.push("/comandas")
+    sessionStorage.removeItem("selectedOrder");
+    router.push("/comandas");
 
   } catch (error) {
-    console.error("Erro ao efetuar pagamento:", error)
-    alert("Ocorreu um erro ao fechar a comanda.")
+    console.error("Erro ao efetuar pagamento:", error);
+    toast.error("Ocorreu um erro ao processar o pagamento.");
   }
-}
+};
 
 
 const editOrder = () => {

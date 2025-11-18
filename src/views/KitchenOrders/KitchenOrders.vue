@@ -3,19 +3,37 @@
     <header class="kitchen-header">
       <h4>Pedidos - Cozinha</h4>
       <div class="filters">
-        <button v-for="status in ['All', 'PENDENTE', 'EM PREPARO', 'CONCLUIDO']" :key="status"
-          :class="{ active: filterStatus === status }" @click="filterStatus = status">
+        <button
+          v-for="status in ['All', 'PENDENTE', 'EM PREPARO', 'CONCLUIDO']"
+          :key="status"
+          :class="{ active: filterStatus === status }"
+          @click="filterStatus = status"
+        >
           {{ statusLabels[status] }}
         </button>
-
       </div>
     </header>
 
-    <main class="orders-grid">
-      <div v-for="order in filteredOrders" :key="order.id" class="order-card" :class="statusClass(order.status)">
+    <div v-if="loading" class="loading-container">
+      <div class="spinner"></div>
+    </div>
 
+    <main v-else class="orders-grid">
+      <div v-if="filteredOrders.length === 0" class="empty-state">
+        <p>Nenhum pedido encontrado.</p>
+      </div>
+
+      <div
+        v-else
+        v-for="order in filteredOrders"
+        :key="order.id"
+        class="order-card"
+        :class="statusClass(order.status)"
+      >
         <div class="order-time">
-          <span class="waiting-time"> {{ formatTimeAgo(order.data_criado) }}</span>
+          <span class="waiting-time">
+            {{ formatTimeAgo(order.data_criado) }}</span
+          >
         </div>
 
         <div class="order-meta">
@@ -32,20 +50,24 @@
           <strong>Obs:</strong> {{ order.observacao }}
         </p>
 
-        <button v-if="order.status !== 'CONCLUIDO'" @click="advanceStatus(order.id)" class="complete-btn" :class="{
-          'btn-in-progress': order.status === 'EM PREPARO',
-          'btn-new': order.status === 'PENDENTE'
-        }">
+        <button
+          v-if="order.status !== 'CONCLUIDO'"
+          @click="advanceStatus(order.id)"
+          class="complete-btn"
+          :class="{
+            'btn-in-progress': order.status === 'EM PREPARO',
+            'btn-new': order.status === 'PENDENTE',
+          }"
+        >
           {{
-            order.status === 'PENDENTE'
-              ? 'Iniciar preparo'
-              : order.status === 'EM PREPARO'
-                ? 'Marcar como pronto'
-                : ''
+            order.status === "PENDENTE"
+              ? "Iniciar preparo"
+              : order.status === "EM PREPARO"
+              ? "Marcar como pronto"
+              : ""
           }}
         </button>
       </div>
-
     </main>
   </div>
 </template>
@@ -59,6 +81,7 @@ export default {
   data() {
     return {
       orders: [],
+      loading: true,
       filterStatus: "All",
       statusLabels: {
         All: "Todos",
@@ -66,7 +89,6 @@ export default {
         "EM PREPARO": "Em preparo",
         CONCLUIDO: "Prontos",
       },
-
     };
   },
   computed: {
@@ -90,13 +112,15 @@ export default {
       }
     },
 
-
     async loadOrders() {
+      this.loading = true;
       try {
         const data = await orderService.getAllPedidos();
         this.orders = data;
       } catch (err) {
         console.error("Erro ao carregar pedidos:", err);
+      } finally {
+        this.loading = false;
       }
     },
 
@@ -106,20 +130,19 @@ export default {
       if (order.status === "PENDENTE") order.status = "EM PREPARO";
       else if (order.status === "EM PREPARO") order.status = "CONCLUIDO";
       await orderService.updateStatus(orderId, order.status);
-
     },
     formatTimeAgo(dateString) {
       const date = new Date(dateString);
       const now = new Date();
       const diffMs = now - date;
-  
+
       const diffMinutes = Math.floor(diffMs / 60000);
       const diffHours = Math.floor(diffMinutes / 60);
-  
+
       if (diffMinutes < 1) return "Agora mesmo";
       if (diffMinutes < 60) return `Há ${diffMinutes} min`;
       if (diffHours < 24) return `Há ${diffHours}h`;
-  
+
       const diffDays = Math.floor(diffHours / 24);
       return `Há ${diffDays} dia${diffDays > 1 ? "s" : ""}`;
     },
@@ -131,6 +154,5 @@ export default {
   unmounted() {
     clearInterval(this.interval);
   },
-
 };
 </script>
