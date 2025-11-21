@@ -2,7 +2,7 @@
   <div class="order-launch">
     <header class="order-header">
       <h4>Lançamento de Pedido</h4>
- <button v-if="isAdmin" class="new-product-btn" @click="openNewProductModal">
+      <button v-if="isAdmin" class="new-product-btn" @click="openNewProductModal">
         + Novo Produto
       </button>
 
@@ -19,20 +19,11 @@
         <div class="order-field order-id-field">
           <div class="order-id-label-row">
             <label for="order-id">ID da Comanda:</label>
-            <!-- <button 
-        :class="['new-order-btn', { active: novaComanda }]" 
-        @click="novaComanda = !novaComanda"
-        >
-        Criar nova comanda
-      </button> -->
+            <button :class="['new-order-btn', { active: novaComanda }]" @click="novaComanda = !novaComanda">
+              Criar nova comanda
+            </button>
           </div>
-          <input
-            id="order-id"
-            type="number"
-            v-model="comandaId"
-            :disabled="novaComanda"
-            placeholder="Digite o ID"
-          />
+          <input id="order-id" type="number" v-model="comandaId" :disabled="novaComanda" placeholder="Digite o ID" />
         </div>
         <div class="order-field">
           <label for="observacao">Observação:</label>
@@ -46,7 +37,7 @@
     <main class="order-content">
       <section class="order-products">
         <div v-if="loading" class="loading-container">
-          <div class="spinner"></div>
+          <div class="spinnerOrder"></div>
         </div>
         <div v-else>
           <div class="order-tabs">
@@ -56,7 +47,7 @@
           </div>
 
           <div class="order-items">
-              <div v-for="item in filteredItems" :key="item.id" class="order-item-card">
+            <div v-for="item in filteredItems" :key="item.id" class="order-item-card">
               <div class="item-info">
                 <h3>{{ item.name }}</h3>
               </div>
@@ -72,7 +63,7 @@
                   <button @click="addItem(item)">+</button>
                 </div>
               </div>
-                <button v-if="isAdmin" class="edit-btn" @click="openEditProductModal(item)" title="Editar produto">
+              <button v-if="isAdmin" class="edit-btn" @click="openEditProductModal(item)" title="Editar produto">
                 <i class="fas fa-edit"></i>
               </button>
             </div>
@@ -105,20 +96,16 @@
           <strong>Total:</strong> R$ {{ cartTotal.toFixed(2) }}
         </div>
 
-       <button v-if="cart.length > 0" class="confirm-btn" @click="confirmOrder">
-          Confirmar Pedido
+        <button v-if="cart.length > 0" class="confirm-btn" :disabled="loadingOrder" @click="confirmOrder">
+          <span v-if="!loadingOrder">Confirmar Pedido</span>
+          <span v-else class="spinner"></span>
         </button>
+
       </aside>
     </main>
   </div>
-  <NewProduct
-    :show="showNewProductModal"
-    :form="newProductForm"
-    :editingItem="editingItem"
-    @close="closeNewProductModal"
-    @save="saveNewProduct"
-    @delete="deleteProduto"
-  />
+  <NewProduct :show="showNewProductModal" :form="newProductForm" :editingItem="editingItem"
+    @close="closeNewProductModal" @save="saveNewProduct" @delete="deleteProduto" />
 </template>
 
 <script setup>
@@ -131,7 +118,8 @@ import "./Orderlaunch.css";
 import { getDecodedToken } from "../../service/authservice.js";
 
 const decoded = getDecodedToken();
-const isAdmin = decoded?.role === "admin";
+const loadingOrder = ref(false);
+const isAdmin = decoded?.role === "ADMIN";
 const toast = useToast();
 const loading = ref(true);
 const tableNumber = ref("");
@@ -151,7 +139,7 @@ const newProductForm = ref({
 });
 
 const openNewProductModal = () => {
-newProductForm.value = { nome: "", categoria: "", preco: 0, estoque: 0, qtde_min: 0 };
+  newProductForm.value = { nome: "", categoria: "", preco: 0, estoque: 0, qtde_min: 0 };
   showNewProductModal.value = true;
 };
 const editingItem = ref(null);
@@ -290,12 +278,31 @@ const cartTotal = computed(() =>
 );
 
 const confirmOrder = async () => {
-  if (!tableNumber.value) return toast.warning("Informe o número da mesa.");
-  if (!novaComanda.value && !comandaId.value) return toast.warning("Informe o ID da comanda.");
-  if (cart.value.length === 0) return toast.info("Adicione pelo menos um item ao pedido.");
+  if (loadingOrder.value) return;
+
+  loadingOrder.value = true;
+
+  if (!tableNumber.value) {
+    toast.warning("Informe o número da mesa.");
+    loadingOrder.value = false;
+    return;
+  }
+
+  if (!novaComanda.value && !comandaId.value) {
+    toast.warning("Informe o ID da comanda.");
+    loadingOrder.value = false;
+    return;
+  }
+
+  if (cart.value.length === 0) {
+    toast.info("Adicione pelo menos um item ao pedido.");
+    loadingOrder.value = false;
+    return;
+  }
 
   const pedido = {
     id_comanda: novaComanda.value ? null : Number(comandaId.value),
+    mesa: Number(tableNumber.value),
     status: "PENDENTE",
     observacao: observacao.value || "",
     produtos: cart.value.map((i) => ({
@@ -310,19 +317,22 @@ const confirmOrder = async () => {
 
     if (response.data.sucesso === true) {
       toast.success(response.data.mensagem || "Pedido criado com sucesso!");
+
       comandaId.value = "";
       tableNumber.value = "";
       observacao.value = "";
       novaComanda.value = false;
       items.value.forEach((i) => (i.quantity = 0));
     } else {
-      console.error("Erro na resposta da API:", response.data);
       toast.error("Erro ao criar pedido.");
     }
 
   } catch (error) {
     console.error("Erro ao criar pedido:", error);
     toast.error("Erro ao criar pedido.");
+  } finally {
+    loadingOrder.value = false;
   }
 };
+
 </script>

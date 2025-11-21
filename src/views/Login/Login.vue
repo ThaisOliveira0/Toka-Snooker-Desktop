@@ -22,9 +22,11 @@
           </div>
 
 
-          <button type="submit" class="auth-button" @click.stop="handleLogin">
-            Entrar
+          <button type="submit" class="auth-button" :disabled="loading">
+            <span v-if="!loading">Entrar</span>
+            <span v-else class="spinner"></span>
           </button>
+
 
           <a href="/esqueci-senha" class="forgot-password">Esqueci minha senha</a>
 
@@ -50,6 +52,7 @@ import { useToast } from 'vue-toastification'
 import { getDecodedToken } from '@/service/authservice.js'
 
 const decoded = getDecodedToken()
+const loading = ref(false)
 const isAdmin = decoded?.role === 'ADMIN' || decoded?.tipo_usuario === 'ADMIN'
 const email = ref('')
 const senha = ref('')
@@ -63,20 +66,23 @@ function togglePassword() {
 }
 
 async function handleLogin() {
+  if (loading.value) return
 
+  loading.value = true
   errorMessage.value = ''
 
   if (!email.value || !senha.value) {
-    toast.warning('Por favor, preencha todos os campos.', { position: 'top-right' })
+    toast.warning('Por favor, preencha todos os campos.')
+    loading.value = false
     return
   }
 
   try {
     const { token } = await login(email.value, senha.value)
-    
+
     if (token) {
       sessionStorage.setItem("token", token)
-      toast.success('Login realizado com sucesso!', { position: 'top-right' })
+      toast.success('Login realizado com sucesso!')
       window.location.href = '/'
     }
 
@@ -85,27 +91,20 @@ async function handleLogin() {
 
     if (error.response) {
       const status = error.response.status
-
       switch (status) {
-        case 400:
-          errorMessage.value = 'Dados inválidos. Verifique o e-mail e senha.'
-          break
-        case 401:
-          errorMessage.value = 'E-mail ou senha incorretos ou não autorizados.'
-          break
-        case 404:
-          errorMessage.value = 'E-mail não encontrado. Verifique e tente novamente.'
-          break
-        case 500:
-          errorMessage.value = 'Erro interno no servidor. Tente novamente mais tarde.'
-          break
-        default:
-          errorMessage.value = `Erro inesperado (${status}).`
+        case 400: errorMessage.value = 'Dados inválidos.'; break
+        case 401: errorMessage.value = 'E-mail ou senha incorretos.'; break
+        case 404: errorMessage.value = 'E-mail não encontrado.'; break
+        case 500: errorMessage.value = 'Erro interno no servidor.'; break
+        default:  errorMessage.value = `Erro inesperado (${status}).`
       }
     } else {
-      errorMessage.value = 'Falha de conexão. Verifique sua internet.'
-      toast.error(errorMessage.value, { position: 'top-right' })
+      errorMessage.value = 'Falha de conexão.'
+      toast.error(errorMessage.value)
     }
+
+  } finally {
+    loading.value = false
   }
 }
 
