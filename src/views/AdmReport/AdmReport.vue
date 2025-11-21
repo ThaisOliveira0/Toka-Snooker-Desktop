@@ -27,52 +27,63 @@
       </div>
       <div class="report-card">
         <span>Total Vendas em R$:</span>
-        <strong>{{ totalValor }}</strong>
+        <strong>{{ formatCurrency(totalValor) }}</strong>
       </div>
       <div class="report-card">
         <span>Item mais vendido:</span>
         <strong>{{ produtoMaisVendido }}</strong>
       </div>
       <div class="report-card">
-        <span>Total de Músicas</span>
-        <strong>{{ totalComandas }}</strong>
+        <span>Total Músicas em R$:</span>
+        <strong>{{ formatCurrency(totalValorMusicas) }}</strong>
       </div>
       <div class="report-card">
-        <span>Total Vendas em R$:</span>
-        <strong>300</strong>
-        <!-- <strong>{{ musicaMaisTocada }}</strong> -->
+        <span>Total Músicas R$:</span>
+        <strong>{{ totalValorMusicas }}</strong>
       </div>
       <div class="report-card">
         <span>Música mais tocada:</span>
-        <strong>As It Was</strong>
-        <!-- <strong>{{ musicaMaisTocada }}</strong> -->
+        <strong>{{ musicaMaisTocada }}</strong>
       </div>
     </div>
 
     <div class="chart-container">
       <div class="chart-header">
+
         <select v-model="selectedMonth" class="month-filter">
           <option v-for="(month, index) in months" :key="index" :value="index + 1">
             {{ month }}
           </option>
         </select>
+
+        <select v-model="chartType" class="month-filter">
+          <option value="orders">Pedidos</option>
+          <option value="music">Músicas</option>
+        </select>
+
       </div>
 
-      <MonthlyChart :month="selectedMonth" />
+      <MonthlyChart :month="selectedMonth" :year="selectedYear" :type="chartType" :data="graphData" />
     </div>
   </div>
 </template>
 
 <script setup>
+import { ref, watch, onMounted } from "vue";
 import MonthlyChart from "@/components/MonthlyChart.vue";
 import reportsService from "@/service/reportsService";
-import { ref } from "vue";
 import "./AdmReport.css";
 
 const today = new Date();
+
+const selectedYear = ref(today.getFullYear());
+const selectedMonth = ref(today.getMonth() + 1);
+const chartType = ref("orders");
+
 const firstDay = new Date(today.getFullYear(), today.getMonth(), 1)
   .toISOString()
   .split("T")[0];
+
 const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
   .toISOString()
   .split("T")[0];
@@ -80,30 +91,70 @@ const lastDay = new Date(today.getFullYear(), today.getMonth() + 1, 0)
 const startDate = ref(firstDay);
 const endDate = ref(lastDay);
 
-const totalComandas = ref(0);
+const totalMusicas = ref(0);
 const totalPedidos = ref(0);
 const totalValor = ref(0);
+const totalValorMusicas = ref(0);
 const produtoMaisVendido = ref("");
 const musicaMaisTocada = ref("");
+
+const graphData = ref([]);
 
 const months = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
 ];
-const selectedMonth = ref(today.getMonth());
 
+watch([selectedMonth, chartType], () => {
+  loadGraph();
+});
+
+onMounted(() => {
+  loadGraph();
+});
+
+const currencyFormatter = new Intl.NumberFormat('pt-BR', {
+  style: 'currency',
+  currency: 'BRL'
+});
+const formatCurrency = (value) => currencyFormatter.format(value);
 async function applyFilter() {
   try {
-    const data = await reportsService.getReports(startDate.value, endDate.value);
-    if (data) {
-      totalComandas.value = data.total_comandas || 0;
-      totalPedidos.value = data.total_pedidos || 0;
-      totalValor.value = data.total_valor || 0;
-      produtoMaisVendido.value = data.produto_mais_vendido || "—";
-      musicaMaisTocada.value = data.musica_mais_tocada || "—";
+    const [orders, music] = await Promise.all([
+      reportsService.getReportsOrder(startDate.value, endDate.value),
+      reportsService.getReportsMusic(startDate.value, endDate.value)
+    ]);
+
+    if (orders) {
+      totalPedidos.value = orders.total_pedidos || 0;
+      totalValor.value = orders.total_valor || 0;
+      produtoMaisVendido.value = orders.produto_mais_vendido || "—";
     }
+
+    if (music) {
+      totalMusicas.value = music.total_musicas_tocadas || 0;
+      totalValorMusicas.value = music.total_valor_musicas || 0;
+      musicaMaisTocada.value = music.musica_mais_tocada || "—";
+    }
+
   } catch (err) {
     console.error("Erro ao aplicar filtro:", err);
+  }
+}
+
+
+async function loadGraph() {
+  try {
+    const data = await reportsService.getGraphInfo(
+      selectedYear.value,
+      selectedMonth.value,
+      chartType.value
+    );
+
+    graphData.value = data;
+
+  } catch (err) {
+    console.error("Erro ao carregar o gráfico:", err);
   }
 }
 </script>

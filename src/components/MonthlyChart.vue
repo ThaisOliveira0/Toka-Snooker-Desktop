@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick } from 'vue'
+import { ref, watch, onMounted, computed } from "vue";
 import {
   Chart,
   Title,
@@ -16,7 +16,7 @@ import {
   CategoryScale,
   LinearScale,
   PointElement
-} from 'chart.js'
+} from "chart.js";
 
 Chart.register(
   Title,
@@ -27,78 +27,115 @@ Chart.register(
   CategoryScale,
   LinearScale,
   PointElement
-)
+);
 
 const props = defineProps({
-  month: { type: Number, default: new Date().getMonth() + 1 },
-  year: { type: Number, default: new Date().getFullYear() }
-})
+  month: Number,
+  year: Number,
+  data: Array,
+  type: String
+});
 
-const chartCanvas = ref(null)
-let chartInstance = null
+const chartCanvas = ref(null);
+let chartInstance = null;
+
+const chartTitle = computed(() => {
+  const tipo = props.type === "orders" ? "Pedidos" : "Músicas";
+  return `${tipo} – ${props.month}/${props.year}`;
+});
 
 function renderChart() {
-  let labels = []
-  let data = []
+  if (!props.data || props.data.length === 0) return;
 
-  if (props.month === 0) {
-    labels = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez']
-    data = labels.map(() => Math.floor(Math.random() * 100))
-  } else {
-    const daysInMonth = new Date(props.year, props.month, 0).getDate()
-    labels = Array.from({ length: daysInMonth }, (_, i) => i + 1)
-    data = labels.map(() => Math.floor(Math.random() * 100))
-  }
+  const labels = props.data.map(item => new Date(item.dia).getDate());
+  const comandasData = props.data.map(item => item.total_comandas);
+  const pedidosData = props.data.map(item => item.total_pedidos);
+  const valorData = props.data.map(item => item.total_valor);
 
-  const chartLabel = props.month === 0 ? `Vendas Ano ${props.year}` : `Vendas ${props.month}/${props.year}`
+  const chartLabelTitle = chartTitle.value;
+
+  const datasets = [
+    {
+      label: "Total de Comandas",
+      data: comandasData,
+      borderColor: "#2196F3",
+      backgroundColor: "rgba(33,150,243,0.2)",
+      fill: true,
+      tension: 0.3
+    },
+    {
+      label: "Total de Pedidos",
+      data: pedidosData,
+      borderColor: "#4CAF50",
+      backgroundColor: "rgba(76,175,80,0.2)",
+      fill: true,
+      tension: 0.3
+    },
+    {
+      label: "Total em Valor (R$)",
+      data: valorData,
+      borderColor: "#FF9800",
+      backgroundColor: "rgba(255,152,0,0.2)",
+      fill: true,
+      tension: 0.3
+    }
+  ];
 
   if (chartInstance) {
-    chartInstance.data.labels = labels
-    chartInstance.data.datasets[0].data = data
-    chartInstance.data.datasets[0].label = chartLabel
-    chartInstance.options.plugins.title.text = props.month === 0 
-      ? `Relatório Anual - ${props.year}`
-      : `Relatório Mensal - ${props.month}/${props.year}`
-    chartInstance.update()
-  } else {
-    chartInstance = new Chart(chartCanvas.value, {
-      type: 'line',
-      data: { labels, datasets: [{ label: chartLabel, data, borderColor: '#43a047', backgroundColor: 'rgba(67,160,71,0.2)', fill: true, tension: 0.4, pointBackgroundColor: '#a5d6a7', pointBorderColor: '#ffffff44' }] },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'top' },
-          title: { display: true, text: chartLabel, color: '#305532', font: { size: 18, weight: '600' } }
-        },
-        scales: {
-          y: { beginAtZero: true, ticks: { color: '#333' }, grid: { color: 'rgba(0,0,0,0.05)' } },
-          x: { ticks: { color: '#333' }, grid: { color: 'rgba(0,0,0,0.05)' } }
-        }
-      }
-    })
+    chartInstance.data.labels = labels;
+    chartInstance.data.datasets = datasets;
+    chartInstance.options.plugins.title.text = chartLabelTitle;
+    chartInstance.update();
+    return;
   }
+
+  chartInstance = new Chart(chartCanvas.value, {
+    type: "line",
+    data: { labels, datasets },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "top" },
+        title: {
+          display: true,
+          text: chartLabelTitle,
+          font: {
+            size: 22,     
+            weight: "bold"
+          },
+          padding: {
+            top: 15,
+            bottom: 20
+          }
+        }
+
+      }
+    }
+  });
 }
 
-onMounted(async () => {
-  await nextTick()
-  renderChart()
-})
+watch(
+  () => [props.data, props.month, props.year, props.type],
+  renderChart,
+  { deep: true }
+);
 
-watch([() => props.month, () => props.year], () => {
-  renderChart()
-})
+onMounted(renderChart);
 </script>
+
+
 
 <style scoped>
 .chart-wrapper {
   background-color: #fff;
   padding: 20px;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-  height: 400px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+  height: 500px;
   width: 100%;
 }
+
 
 canvas {
   width: 100% !important;
